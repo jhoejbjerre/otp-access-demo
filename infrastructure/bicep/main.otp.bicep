@@ -115,4 +115,4 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
   }  
 }
 
-output keyVaultName string = keyVault.name
+output keyVaultName string = keyVault.outputs.keyVaultName
