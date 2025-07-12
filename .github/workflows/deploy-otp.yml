@@ -36,7 +36,7 @@ jobs:
 
       - name: Deploy OTP resources (resource group level)
         run: |
-          az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/dev/main.otp.dev.parameters.json)"
+          az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}"
           
       - name: Set secrets in Key Vault
         if: success()
@@ -86,7 +86,7 @@ jobs:
 
       - name: Deploy OTP resources (resource group level)
         run: |
-          az deployment group create --name deploy-otp-test --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/test/main.otp.test.parameters.json)"
+          az deployment group create --name deploy-otp-test --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.test.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}"
           
       - name: Set secrets in Key Vault
         if: success()
@@ -135,7 +135,7 @@ jobs:
 
       - name: Deploy OTP resources (resource group level)
         run: |
-          az deployment group create --name deploy-otp-prod --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/prod/main.otp.prod.parameters.json)"
+          az deployment group create --name deploy-otp-prod --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.prod.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}"
           
       - name: Set secrets in Key Vault
         if: success()
