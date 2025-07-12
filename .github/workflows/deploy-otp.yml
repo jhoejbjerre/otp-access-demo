@@ -35,7 +35,7 @@ jobs:
 
       - name: Deploy OTP resources (resource group level) (dev)
         run: |
-          az deployment group create --resource-group rg-environment-dev --template-file bicep/main.otp.bicep --parameters @bicep/env/dev/main.otp.dev.parameters.json
+          az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file bicep/main.otp.bicep --parameters @bicep/env/dev/main.otp.dev.parameters.json
 
       - name: Show deployment logs on failure (dev)
         if: failure()
@@ -72,7 +72,7 @@ jobs:
 
       - name: Deploy OTP resources (resource group level) (test)
         run: |
-          az deployment group create --resource-group rg-environment-test --template-file bicep/main.otp.bicep --parameters @bicep/env/test/main.otp.test.parameters.json
+          az deployment group create --name deploy-otp-test --resource-group rg-environment-test --template-file bicep/main.otp.bicep --parameters @bicep/env/test/main.otp.test.parameters.json
 
       - name: Show deployment logs on failure (test)
         if: failure()
@@ -109,7 +109,7 @@ jobs:
 
       - name: Deploy OTP resources (resource group level) (prod)
         run: |
-          az deployment group create --resource-group rg-environment-prod --template-file bicep/main.otp.bicep --parameters @bicep/env/prod/main.otp.prod.parameters.json
+          az deployment group create --name deploy-otp-prod --resource-group rg-environment-prod --template-file bicep/main.otp.bicep --parameters @bicep/env/prod/main.otp.prod.parameters.json
 
       - name: Show deployment logs on failure (prod)
         if: failure()
