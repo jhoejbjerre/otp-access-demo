@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "westeurope"
+    },
+    "environment": {
+      "value": "dev"
+    },
+    "roles": {
+      "value": {
+        "Key Vault Secrets User": "4633458b-17de-408a-b874-0445c86b69e6"
+      }
+    }
+  }
+}
