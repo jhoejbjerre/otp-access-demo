@@ -21,6 +21,9 @@ param storageAccountResourceGroup string
 ])
 param runtime string = 'dotnet'
 
+@description('App Insights connection string')
+param appInsightsConnectionString string
+
 @description('Should the Function App only be accessible privately (no public access)?')
 param disablePublicAccess bool = true
 
@@ -63,11 +66,15 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: 'dotnet-isolated'
+          value: runtime == 'dotnet' ? 'dotnet-isolated' : runtime
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsightsConnectionString
         }
       ]
       ftpsState: 'Disabled'

@@ -54,6 +54,15 @@ module sqlDb 'modules/sqlDatabase.bicep' = {
   }  
 }
 
+module appInsights 'modules/applicationInsights.bicep' = {
+  name: 'deploy-appinsights-${environment}'
+  params: {
+    name: 'ai-otp-${environment}'
+    location: location
+  }
+}
+
+
 module functionApp 'modules/functionApp.bicep' = {
   name: 'deploy-funcapp'
   params: {
@@ -64,6 +73,7 @@ module functionApp 'modules/functionApp.bicep' = {
     storageAccountResourceGroup: resourceGroup().name
     runtime: 'dotnet'
     disablePublicAccess: true
+    appInsightsConnectionString: appInsights.outputs.connectionString
   }
   dependsOn: [keyVault, managedIdentity]
 }
