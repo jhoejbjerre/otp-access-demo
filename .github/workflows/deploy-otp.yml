@@ -38,7 +38,7 @@ jobs:
           az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/dev/main.otp.dev.parameters.json)"
           
       - name: Set secrets in Key Vault
-      if: success()
+        if: success()
         run: |
           kvName=$(az deployment group show \
             --resource-group rg-environment-dev \
