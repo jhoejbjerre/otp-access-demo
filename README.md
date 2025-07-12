@@ -16,16 +16,16 @@ This project implements a simple and secure one-time password (OTP) system using
 
 ## 📂 Project Structure
 
+```text
 otp-access-demo/
-
-├── src/ # Clean Architecture codebase
-│ ├── OtpAccess.Api/
-│ ├── OtpAccess.Application/
-│ ├── OtpAccess.Domain/
-│ ├── OtpAccess.Infrastructure/
-├── infra/ # Bicep files for environment deployment
-│ ├── main.bicep
-│ └── parameters/
-├── .github/workflows/ # GitHub Actions deployment
-│ └── deploy.yml
-├── README.md # This file
+├── src/                      # Clean Architecture codebase
+│   ├── OtpAccess.Api/
+│   ├── OtpAccess.Application/
+│   ├── OtpAccess.Domain/
+│   └── OtpAccess.Infrastructure/
+├── infra/                   # Bicep files for environment deployment
+│   ├── main.bicep
+│   └── parameters/
+├── .github/workflows/       # GitHub Actions deployment
+│   └── deploy.yml
+├── README.md                # This file
