@@ -28,7 +28,7 @@ jobs:
 
       - name: Validate resource group deployment
         run: |
-          az deployment group validate --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/dev/main.otp.dev.parameters.json)"
+          az deployment group validate --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}"
 
       - name: Create Resource Groups (subscription level)
         run: |
@@ -78,7 +78,7 @@ jobs:
 
       - name: Validate resource group deployment
         run: |
-          az deployment group validate --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/test/main.otp.test.parameters.json)"
+          az deployment group validate --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.test.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}"
 
       - name: Create Resource Groups (subscription level)
         run: |
@@ -127,7 +127,7 @@ jobs:
 
       - name: Validate resource group deployment
         run: |
-          az deployment group validate --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/prod/main.otp.prod.parameters.json)"
+          az deployment group validate --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.prod.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}"
 
       - name: Create Resource Groups (subscription level)
         run: |
