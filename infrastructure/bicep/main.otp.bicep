@@ -7,6 +7,10 @@ param environment string
 @description('Role definitions')
 param roles object
 
+@description('Object ID of the GitHub Actions Service Principal')
+param githubSpObjectId string
+
+
 @secure()
 param sqlAdminPassword string
 
@@ -37,6 +41,7 @@ module keyVault 'modules/keyVault.bicep' = {
     name: 'kv-${environment}-${uniqueSuffix}'
     location: location
     userAssignedIdentityId: managedIdentity.outputs.resourceId
+    githubSpObjectId: '${githubSpObjectId}'
   }
   dependsOn: [storage]
 }

@@ -7,6 +7,10 @@ param location string
 @description('User-Assigned Managed Identity resource ID')
 param userAssignedIdentityId string
 
+@description('Object ID of the GitHub Actions Service Principal')
+param githubSpObjectId string
+
+
 resource uami 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   scope: resourceGroup()
   name: last(split(userAssignedIdentityId, '/'))
@@ -28,6 +32,17 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
         permissions: {
           secrets: [
             'get'
+            'list'
+          ]
+        }
+      }
+      {
+        tenantId: subscription().tenantId
+        objectId: githubSpObjectId
+        permissions: {
+          secrets: [
+            'get'
+            'set'
             'list'
           ]
         }
