@@ -4,15 +4,26 @@ This project implements a simple and secure one-time password (OTP) system using
 
 ## ✅ Features
 
-- 6-digit numeric OTP generation
-- OTP validity: 10 minutes
-- One-time use enforcement
-- Tied to a `SessionId` (or other resource/user reference)
-- Input-friendly and secure
-- Validated using EF Core + SQLite
-- Logging and cleanup of expired OTPs
-- Optional rate limiting (middleware or Azure-native)
-- Infrastructure-as-Code via Bicep
+- 6-digit numeric OTP generation  
+  Easy to input manually and unique per request.
+- OTP validity of 10 minutes  
+  Ensures temporary and time-limited access.
+- One-time use enforcement  
+  Prevents reuse of the same code.
+- Tied to SessionId or resource/user reference  
+  OTPs are bound to a valid context for security.
+- Validation via Entity Framework Core with Azure SQL Database  
+  Provides reliable data access and persistence.
+- Logging and cleanup of expired OTPs  
+  Maintains auditability and system hygiene.
+- Optional rate limiting support  
+  Middleware-based or leveraging Azure-native rate limiting resources.
+- Infrastructure as Code with Azure Bicep  
+  Deploys resources for Function App, Key Vault, SQL, Storage, Networking, and RBAC.
+- Azure Functions hosted on Linux Consumption Plan  
+  Using .NET 8 isolated worker model for cost-effective and scalable hosting.
+- GitHub Actions CI/CD pipeline  
+  Supports multi-environment deployment with validation, sequential jobs, and manual gates.
 
 ## 📂 Project Structure
 
@@ -23,9 +34,18 @@ otp-access-demo/
 │   ├── OtpAccess.Application/
 │   ├── OtpAccess.Domain/
 │   └── OtpAccess.Infrastructure/
-├── infra/                   # Bicep files for environment deployment
+├── bicep/                    # Azure Bicep IaC templates
 │   ├── main.bicep
-│   └── parameters/
-├── .github/workflows/       # GitHub Actions deployment
-│   └── deploy.yml
-├── README.md                # This file
+│   ├── main.otp.bicep
+│   ├── env/                  # Environment parameter files
+│   │   ├── dev/
+│   │   │   └── main.otp.dev.parameters.json
+│   │   ├── test/
+│   │   │   └── main.otp.test.parameters.json
+│   │   └── prod/
+│   │       └── main.otp.prod.parameters.json
+│   └── modules/              # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
+├── .github/
+│   └── workflows/            # GitHub Actions CI/CD pipeline files
+│       └── deploy-otp.yml
+├── README.md                 # Project overview and instructions
