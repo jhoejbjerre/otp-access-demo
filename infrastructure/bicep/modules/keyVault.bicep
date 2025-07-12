@@ -4,8 +4,13 @@ param name string
 @description('Location of the Key Vault')
 param location string
 
-@description('User-Assigned Managed Identity ID that will get access')
+@description('User-Assigned Managed Identity resource ID')
 param userAssignedIdentityId string
+
+resource uami 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  scope: resourceGroup()
+  name: last(split(userAssignedIdentityId, '/'))
+}
 
 resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   name: name
@@ -19,7 +24,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
     accessPolicies: [
       {
         tenantId: subscription().tenantId
-        objectId: userAssignedIdentityId
+        objectId: uami.properties.principalId
         permissions: {
           secrets: [
             'get'

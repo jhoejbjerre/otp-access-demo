@@ -31,15 +31,17 @@ module keyVault 'modules/keyVault.bicep' = {
   params: {
     name: 'kv-${environment}'
     location: location
-    userAssignedIdentityId: managedIdentity.outputs.resourceId        
+    userAssignedIdentityId: managedIdentity.outputs.resourceId
   }
   dependsOn: [storage]
 }
 
+var uniqueSuffix = uniqueString(resourceGroup().id)
+
 module sqlServer 'modules/sqlServer.bicep' = {
   name: 'deploy-sqlserver'
   params: {
-    name: 'sql-${environment}'
+    name: 'sql-${environment}-${uniqueSuffix}'
     location: location
     administratorLogin: 'sqladminuser'
     administratorPassword: 'PLACEHOLDER'
