@@ -23,19 +23,19 @@ jobs:
 
       - name: Validate subscription deployment (dev)
         run: |
-          az deployment sub validate --template-file bicep/main.bicep --location=westeurope --parameters environment=dev
+          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope --parameters environment=dev
 
       - name: Validate resource group deployment (dev)
         run: |
-          az deployment group validate --resource-group rg-environment-dev --template-file bicep/main.otp.bicep --parameters @bicep/env/dev/main.otp.dev.parameters.json
+          az deployment group validate --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @bicep/env/dev/main.otp.dev.parameters.json
 
       - name: Deploy Resource Groups (subscription level) (dev)
         run: |
-          az deployment sub create --template-file bicep/main.bicep --location=westeurope --parameters environment=dev
+          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --parameters environment=dev
 
       - name: Deploy OTP resources (resource group level) (dev)
         run: |
-          az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file bicep/main.otp.bicep --parameters @bicep/env/dev/main.otp.dev.parameters.json
+          az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @bicep/env/dev/main.otp.dev.parameters.json
 
       - name: Show deployment logs on failure (dev)
         if: failure()
@@ -60,19 +60,19 @@ jobs:
 
       - name: Validate subscription deployment (test)
         run: |
-          az deployment sub validate --template-file bicep/main.bicep --location=westeurope --parameters environment=test
+          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope --parameters environment=test
 
       - name: Validate resource group deployment (test)
         run: |
-          az deployment group validate --resource-group rg-environment-test --template-file bicep/main.otp.bicep --parameters @bicep/env/test/main.otp.test.parameters.json
+          az deployment group validate --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters @bicep/env/test/main.otp.test.parameters.json
 
       - name: Deploy Resource Groups (subscription level) (test)
         run: |
-          az deployment sub create --template-file bicep/main.bicep --location=westeurope --parameters environment=test
+          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --parameters environment=test
 
       - name: Deploy OTP resources (resource group level) (test)
         run: |
-          az deployment group create --name deploy-otp-test --resource-group rg-environment-test --template-file bicep/main.otp.bicep --parameters @bicep/env/test/main.otp.test.parameters.json
+          az deployment group create --name deploy-otp-test --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters @bicep/env/test/main.otp.test.parameters.json
 
       - name: Show deployment logs on failure (test)
         if: failure()
@@ -97,19 +97,19 @@ jobs:
 
       - name: Validate subscription deployment (prod)
         run: |
-          az deployment sub validate --template-file bicep/main.bicep --location=westeurope --parameters environment=prod
+          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope --parameters environment=prod
 
       - name: Validate resource group deployment (prod)
         run: |
-          az deployment group validate --resource-group rg-environment-prod --template-file bicep/main.otp.bicep --parameters @bicep/env/prod/main.otp.prod.parameters.json
+          az deployment group validate --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @bicep/env/prod/main.otp.prod.parameters.json
 
       - name: Deploy Resource Groups (subscription level) (prod)
         run: |
-          az deployment sub create --template-file bicep/main.bicep --location=westeurope --parameters environment=prod
+          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --parameters environment=prod
 
       - name: Deploy OTP resources (resource group level) (prod)
         run: |
-          az deployment group create --name deploy-otp-prod --resource-group rg-environment-prod --template-file bicep/main.otp.bicep --parameters @bicep/env/prod/main.otp.prod.parameters.json
+          az deployment group create --name deploy-otp-prod --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @bicep/env/prod/main.otp.prod.parameters.json
 
       - name: Show deployment logs on failure (prod)
         if: failure()
