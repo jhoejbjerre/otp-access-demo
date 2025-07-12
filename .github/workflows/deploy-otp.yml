@@ -21,19 +21,19 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Validate subscription deployment (dev)
+      - name: Validate subscription deployment
         run: |
           az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope
 
-      - name: Validate resource group deployment (dev)
+      - name: Validate resource group deployment
         run: |
           az deployment group validate --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/dev/main.otp.dev.parameters.json)"
 
-      - name: Create Resource Groups (subscription level) (dev)
+      - name: Create Resource Groups (subscription level)
         run: |
           az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-dev
 
-      - name: Deploy OTP resources (resource group level) (dev)
+      - name: Deploy OTP resources (resource group level)
         run: |
           az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/dev/main.otp.dev.parameters.json)"
           
@@ -49,7 +49,7 @@ jobs:
           az keyvault secret set --vault-name $kvName --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
           az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
 
-      - name: Show deployment logs on failure (dev)
+      - name: Show deployment logs on failure
         if: failure()
         run: |
           az deployment group show --resource-group rg-environment-dev --name deploy-otp-dev || echo "No deployment found (likely validation failure)"
@@ -71,19 +71,19 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Validate subscription deployment (test)
+      - name: Validate subscription deployment
         run: |
           az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope
 
-      - name: Validate resource group deployment (test)
+      - name: Validate resource group deployment
         run: |
           az deployment group validate --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/test/main.otp.test.parameters.json)"
 
-      - name: Create Resource Groups (subscription level) (test)
+      - name: Create Resource Groups (subscription level)
         run: |
           az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-test
 
-      - name: Deploy OTP resources (resource group level) (test)
+      - name: Deploy OTP resources (resource group level)
         run: |
           az deployment group create --name deploy-otp-test --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/test/main.otp.test.parameters.json)"
           
@@ -99,7 +99,7 @@ jobs:
           az keyvault secret set --vault-name $kvName --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
           az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
 
-      - name: Show deployment logs on failure (test)
+      - name: Show deployment logs on failure
         if: failure()
         run: |
           az deployment group show --resource-group rg-environment-test --name deploy-otp-test || echo "No deployment found (likely validation failure)"
@@ -120,19 +120,19 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Validate subscription deployment (prod)
+      - name: Validate subscription deployment
         run: |
           az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope
 
-      - name: Validate resource group deployment (prod)
+      - name: Validate resource group deployment
         run: |
           az deployment group validate --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/prod/main.otp.prod.parameters.json)"
 
-      - name: Create Resource Groups (subscription level) (prod)
+      - name: Create Resource Groups (subscription level)
         run: |
           az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-prod
 
-      - name: Deploy OTP resources (resource group level) (prod)
+      - name: Deploy OTP resources (resource group level)
         run: |
           az deployment group create --name deploy-otp-prod --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/prod/main.otp.prod.parameters.json)"
           
@@ -149,7 +149,7 @@ jobs:
           az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
 
 
-      - name: Show deployment logs on failure (prod)
+      - name: Show deployment logs on failure
         if: failure()
         run: |
           az deployment group show --resource-group rg-environment-prod --name deploy-otp-prod || echo "No deployment found (likely validation failure)"

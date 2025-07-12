@@ -70,7 +70,7 @@ module appInsights 'modules/applicationInsights.bicep' = {
 module functionApp 'modules/functionApp.bicep' = {
   name: 'deploy-funcapp'
   params: {
-    name: 'func-${environment}'
+    name: 'func-otp-${environment}-${uniqueSuffix}'
     location: location
     hostingPlanName: 'plan-${environment}'
     storageAccountName: storage.outputs.storageAccountName
