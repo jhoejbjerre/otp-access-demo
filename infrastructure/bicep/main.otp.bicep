@@ -7,6 +7,9 @@ param environment string
 @description('Role definitions')
 param roles object
 
+@secure()
+param sqlAdminPassword string
+
 var storageAccountName = toLower('stotp${environment}${uniqueString(resourceGroup().id)}')
 
 // Modules
@@ -44,7 +47,7 @@ module sqlServer 'modules/sqlServer.bicep' = {
     name: 'sql-${environment}-${uniqueSuffix}'
     location: location
     administratorLogin: 'sqladminuser'
-    administratorPassword: 'PLACEHOLDER'
+    administratorPassword: sqlAdminPassword
   }
 }
 
