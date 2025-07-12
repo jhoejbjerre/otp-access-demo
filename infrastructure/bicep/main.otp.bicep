@@ -114,3 +114,5 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
     subresourceName: 'sqlServer'
   }  
 }
+
+output keyVaultName string = keyVault.name
