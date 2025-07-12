@@ -36,12 +36,8 @@ jobs:
 
       - name: Deploy OTP resources (resource group level)
         run: |
-          az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
-          
-      - name: Check output
-        run: |
-          az deployment group show --resource-group rg-environment-dev --name deploy-otp-dev --query "properties.outputs"
-          
+          az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"         
+                
       - name: Set secrets in Key Vault
         if: success()
         run: |
