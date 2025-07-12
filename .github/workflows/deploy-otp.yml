@@ -4,12 +4,13 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:    
 
-jobs:
+jobs:  
   deploy-dev:
     runs-on: ubuntu-latest
     environment: dev
-
+    
     steps:
       - uses: actions/checkout@v3
 
@@ -57,9 +58,9 @@ jobs:
 
   deploy-test:
     runs-on: ubuntu-latest
-    environment: test
+    environment: test    
     needs: deploy-dev
-
+    
     steps:
       - uses: actions/checkout@v3
 
@@ -106,7 +107,7 @@ jobs:
 
   deploy-prod:
     runs-on: ubuntu-latest
-    environment: prod
+    environment: prod    
     needs: deploy-test
 
     steps:
