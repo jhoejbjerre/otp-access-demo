@@ -1,4 +1,6 @@
-# Infrastructure as Code (IaC) - Azure Bicep
+# OTP Infrastructure as Code (IaC) - Azure Bicep
+![Deploy OTP Infra](https://github.com/jesperh/otp-infra/actions/workflows/deploy.yml/badge.svg)
+
 
 This folder contains Bicep modules and environment-specific parameter files for deploying the OTP Proof of Concept infrastructure on Azure.
 
