@@ -36,6 +36,18 @@ jobs:
       - name: Deploy OTP resources (resource group level) (dev)
         run: |
           az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/dev/main.otp.dev.parameters.json)"
+          
+      - name: Set secrets in Key Vault
+      if: success()
+        run: |
+          kvName=$(az deployment group show \
+            --resource-group rg-environment-dev \
+            --name deploy-otp-dev \
+            --query "properties.outputs.keyVaultName.value" \
+            --output tsv)
+
+          az keyvault secret set --vault-name $kvName --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
+          az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
 
       - name: Show deployment logs on failure (dev)
         if: failure()
@@ -74,6 +86,18 @@ jobs:
       - name: Deploy OTP resources (resource group level) (test)
         run: |
           az deployment group create --name deploy-otp-test --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/test/main.otp.test.parameters.json)"
+          
+      - name: Set secrets in Key Vault
+        if: success()
+        run: |
+          kvName=$(az deployment group show \
+            --resource-group rg-environment-test \
+            --name deploy-otp-test \
+            --query "properties.outputs.keyVaultName.value" \
+            --output tsv)
+
+          az keyvault secret set --vault-name $kvName --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
+          az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
 
       - name: Show deployment logs on failure (test)
         if: failure()
@@ -111,6 +135,19 @@ jobs:
       - name: Deploy OTP resources (resource group level) (prod)
         run: |
           az deployment group create --name deploy-otp-prod --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters "$(cat infrastructure/bicep/env/prod/main.otp.prod.parameters.json)"
+          
+      - name: Set secrets in Key Vault
+        if: success()
+        run: |
+          kvName=$(az deployment group show \
+            --resource-group rg-environment-prod \
+            --name deploy-otp-prod \
+            --query "properties.outputs.keyVaultName.value" \
+            --output tsv)
+
+          az keyvault secret set --vault-name $kvName --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
+          az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
+
 
       - name: Show deployment logs on failure (prod)
         if: failure()

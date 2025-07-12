@@ -40,21 +40,5 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-02-01' = {
   }
 }
 
-resource otpSecret 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
-  parent: keyVault
-  name: 'OtpSecretKey'
-  properties: {
-    value: ''
-  }
-}
-
-resource sqlSecret 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = {
-  parent: keyVault
-  name: 'SqlAdminPassword'
-  properties: {
-    value: ''
-  }
-}
-
 output keyVaultName string = keyVault.name
 output keyVaultUri string = keyVault.properties.vaultUri

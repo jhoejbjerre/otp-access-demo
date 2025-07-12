@@ -26,17 +26,17 @@ module managedIdentity 'modules/managedIdentity.bicep' = {
   }
 }
 
+var uniqueSuffix = uniqueString(resourceGroup().id)
+
 module keyVault 'modules/keyVault.bicep' = {
   name: 'deploy-kv'
   params: {
-    name: 'kv-${environment}'
+    name: 'kv-${environment}-${uniqueSuffix}'
     location: location
     userAssignedIdentityId: managedIdentity.outputs.resourceId
   }
   dependsOn: [storage]
 }
-
-var uniqueSuffix = uniqueString(resourceGroup().id)
 
 module sqlServer 'modules/sqlServer.bicep' = {
   name: 'deploy-sqlserver'
