@@ -7,11 +7,13 @@ param environment string
 @description('Role definitions')
 param roles object
 
+var storageAccountName = toLower('stotp${environment}${uniqueString(resourceGroup().id)}')
+
 // Modules
 module storage 'modules/storageAccount.bicep' = {
   name: 'deploy-storage'
   params: {
-    name: 'stor${environment}'
+    name: storageAccountName
     location: location
   }
 }
