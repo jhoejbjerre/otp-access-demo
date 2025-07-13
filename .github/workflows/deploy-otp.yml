@@ -24,25 +24,25 @@ jobs:
 
       - name: Validate subscription deployment
         run: |
-          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope
+          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-dev --parameters environment=dev
 
       - name: Validate resource group deployment
         run: |
-          az deployment group validate --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
+          az deployment group validate --resource-group rg-otp-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
 
       - name: Create Resource Groups (subscription level)
         run: |
-          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-dev
+          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-dev --parameters environment=dev
 
       - name: Deploy OTP resources (resource group level)
         run: |
-          az deployment group create --name deploy-otp-dev --resource-group rg-environment-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"         
+          az deployment group create --name deploy-otp-dev --resource-group rg-otp-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"         
                 
       - name: Set secrets in Key Vault
         if: success()
         run: |
           kvName=$(az deployment group show \
-            --resource-group rg-environment-dev \
+            --resource-group rg-otp-dev \
             --name deploy-otp-dev \
             --query "properties.outputs.keyVaultName.value" \
             --output tsv)
@@ -58,7 +58,7 @@ jobs:
       - name: Show deployment logs on failure
         if: failure()
         run: |
-          az deployment group show --resource-group rg-environment-dev --name deploy-otp-dev || echo "No deployment found (likely validation failure)"
+          az deployment group show --resource-group rg-otp-dev --name deploy-otp-dev || echo "No deployment found (likely validation failure)"
           
 
   deploy-test:
@@ -79,25 +79,25 @@ jobs:
 
       - name: Validate subscription deployment
         run: |
-          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope
+          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-test --parameters environment=test
 
       - name: Validate resource group deployment
         run: |
-          az deployment group validate --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.test.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
+          az deployment group validate --resource-group rg-otp-test --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.test.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
 
       - name: Create Resource Groups (subscription level)
         run: |
-          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-test
+          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-test --parameters environment=test
 
       - name: Deploy OTP resources (resource group level)
         run: |
-          az deployment group create --name deploy-otp-test --resource-group rg-environment-test --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.test.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
+          az deployment group create --name deploy-otp-test --resource-group rg-otp-test --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.test.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
           
       - name: Set secrets in Key Vault
         if: success()
         run: |
           kvName=$(az deployment group show \
-            --resource-group rg-environment-test \
+            --resource-group rg-otp-test \
             --name deploy-otp-test \
             --query "properties.outputs.keyVaultName.value" \
             --output tsv)
@@ -108,7 +108,7 @@ jobs:
       - name: Show deployment logs on failure
         if: failure()
         run: |
-          az deployment group show --resource-group rg-environment-test --name deploy-otp-test || echo "No deployment found (likely validation failure)"
+          az deployment group show --resource-group rg-otp-test --name deploy-otp-test || echo "No deployment found (likely validation failure)"
 
   deploy-prod:
     runs-on: ubuntu-latest
@@ -128,25 +128,25 @@ jobs:
 
       - name: Validate subscription deployment
         run: |
-          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope
+          az deployment sub validate --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-prod --parameters environment=prod
 
       - name: Validate resource group deployment
         run: |
-          az deployment group validate --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.prod.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
+          az deployment group validate --resource-group rg-otp-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.prod.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
 
       - name: Create Resource Groups (subscription level)
         run: |
-          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-prod
+          az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-prod --parameters environment=prod
 
       - name: Deploy OTP resources (resource group level)
         run: |
-          az deployment group create --name deploy-otp-prod --resource-group rg-environment-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.prod.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
+          az deployment group create --name deploy-otp-prod --resource-group rg-otp-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.prod.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
           
       - name: Set secrets in Key Vault
         if: success()
         run: |
           kvName=$(az deployment group show \
-            --resource-group rg-environment-prod \
+            --resource-group rg-otp-prod \
             --name deploy-otp-prod \
             --query "properties.outputs.keyVaultName.value" \
             --output tsv)
@@ -158,4 +158,4 @@ jobs:
       - name: Show deployment logs on failure
         if: failure()
         run: |
-          az deployment group show --resource-group rg-environment-prod --name deploy-otp-prod || echo "No deployment found (likely validation failure)"
+          az deployment group show --resource-group rg-otp-prod --name deploy-otp-prod || echo "No deployment found (likely validation failure)"

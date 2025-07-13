@@ -1,19 +1,17 @@
 targetScope = 'subscription'
 
-@description('The Azure region to deploy the resource groups to')
+@description('The Azure region to deploy the resource group to')
 param location string = 'westeurope'
 
-resource rg_dev 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-  name: 'rg-environment-dev'
-  location: location
-}
+@allowed([
+  'dev'
+  'test'
+  'prod'
+])
+@description('The environment to deploy the resource group for')
+param environment string
 
-resource rg_test 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-  name: 'rg-environment-test'
-  location: location
-}
-
-resource rg_prod 'Microsoft.Resources/resourceGroups@2022-09-01' = {
-  name: 'rg-environment-prod'
+resource resourceGroup 'Microsoft.Resources/resourceGroups@2022-09-01' = {
+  name: 'rg-otp-${environment}'
   location: location
 }
