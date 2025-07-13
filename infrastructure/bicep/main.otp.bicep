@@ -41,7 +41,7 @@ module keyVault 'modules/keyVault.bicep' = {
     name: 'kv-${environment}-${uniqueSuffix}'
     location: location
     userAssignedIdentityId: managedIdentity.outputs.resourceId
-    githubSpObjectId: '${githubSpObjectId}'
+    githubSpObjectId: githubSpObjectId
   }
   dependsOn: [storage]
 }
