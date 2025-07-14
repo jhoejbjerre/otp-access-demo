@@ -21,7 +21,7 @@ jobs:
         uses: azure/login@v1.6.1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}     
-      
+
       - name: Create Resource Groups (subscription level)
         run: |
           az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-dev --parameters environment=dev
@@ -50,10 +50,16 @@ jobs:
       - name: Set OtpDatabaseConnection in Azure App Settings
         if: success()
         run: |
+          funcAppName=$(az deployment group show \
+            --resource-group rg-otp-dev \
+            --name deploy-otp-dev \
+            --query "properties.outputs.functionAppName.value" \
+            --output tsv)
+
           az functionapp config appsettings set \
-          --name func-otp-dev \
-          --resource-group rg-otp-dev \
-          --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_DEV }}"
+            --name $funcAppName \
+            --resource-group rg-otp-dev \
+            --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_DEV }}"
           
       - name: Show deployment logs on failure
         if: failure()
@@ -99,11 +105,17 @@ jobs:
           
       - name: Set OtpDatabaseConnection in Azure App Settings
         if: success()
-        run: |          
+        run: |
+         funcAppName=$(az deployment group show \
+            --resource-group rg-otp-test \
+            --name deploy-otp-test \
+            --query "properties.outputs.functionAppName.value" \
+            --output tsv)
+
           az functionapp config appsettings set \
-          --name func-otp-test \
-          --resource-group rg-otp-test \
-          --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_TEST }}"
+            --name $funcAppName \
+            --resource-group rg-otp-test \
+            --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_TEST }}"
           
       - name: Show deployment logs on failure
         if: failure()
@@ -148,11 +160,17 @@ jobs:
           
       - name: Set OtpDatabaseConnection in Azure App Settings
         if: success()
-        run: |          
+        run: |
+          funcAppName=$(az deployment group show \
+            --resource-group rg-otp-prod \
+            --name deploy-otp-prod \
+            --query "properties.outputs.functionAppName.value" \
+            --output tsv)
+
           az functionapp config appsettings set \
-          --name func-otp-prod \
-          --resource-group rg-otp-prod \
-          --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_PROD }}"          
+            --name $funcAppName \
+            --resource-group rg-otp-prod \
+            --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_PROD }}"          
 
       - name: Show deployment logs on failure
         if: failure()
