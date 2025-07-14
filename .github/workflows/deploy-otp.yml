@@ -46,7 +46,15 @@ jobs:
 
           az keyvault secret set --vault-name "$kvName" --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
           az keyvault secret set --vault-name "$kvName" --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
-
+          
+      - name: Set OtpDatabaseConnection in Azure App Settings
+        if: success()
+        run: |
+          az functionapp config appsettings set \
+          --name func-otp-dev \
+          --resource-group rg-otp-dev \
+          --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_DEV }}"
+          
       - name: Show deployment logs on failure
         if: failure()
         run: |
@@ -87,8 +95,16 @@ jobs:
             --output tsv)
 
           az keyvault secret set --vault-name $kvName --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
-          az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
-
+          az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD 
+          
+      - name: Set OtpDatabaseConnection in Azure App Settings
+        if: success()
+        run: |          
+          az functionapp config appsettings set \
+          --name func-otp-test \
+          --resource-group rg-otp-test \
+          --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_TEST }}"
+          
       - name: Show deployment logs on failure
         if: failure()
         run: |
@@ -129,7 +145,14 @@ jobs:
 
           az keyvault secret set --vault-name $kvName --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
           az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
-
+          
+      - name: Set OtpDatabaseConnection in Azure App Settings
+        if: success()
+        run: |          
+          az functionapp config appsettings set \
+          --name func-otp-prod \
+          --resource-group rg-otp-prod \
+          --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_PROD }}"          
 
       - name: Show deployment logs on failure
         if: failure()
