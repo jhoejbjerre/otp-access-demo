@@ -22,6 +22,9 @@ param appInsightsConnectionString string
 @description('Should the Function App only be accessible privately (no public access)?')
 param disablePublicAccess bool = true
 
+@description('User Assigned Identity Id')
+param userAssignedIdentityId string
+
 // Reference to existing Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
@@ -45,7 +48,10 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
   location: location
   kind: 'functionapp,linux'
   identity: {
-    type: 'SystemAssigned'
+    type: 'SystemAssigned, UserAssigned'
+    userAssignedIdentities: {
+      '${userAssignedIdentityId}': {}
+    }
   }
   properties: {
     serverFarmId: hostingPlan.id

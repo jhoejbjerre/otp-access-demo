@@ -85,6 +85,7 @@ module functionApp 'modules/functionApp.bicep' = {
     disablePublicAccess: true
     appInsightsConnectionString: appInsights.outputs.connectionString
     keyVaultName: keyVault.outputs.keyVaultName
+    userAssignedIdentityId: managedIdentity.outputs.resourceId
   }
 }
 
