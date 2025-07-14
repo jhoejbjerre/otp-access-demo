@@ -79,8 +79,8 @@ jobs:
           az webapp update \
             --resource-group rg-otp-dev \
             --name $funcAppName \
-            --set keyVaultReferenceIdentity=$identityId
-
+            --set keyVaultReferenceIdentity=$identityId           
+          
       - name: Show deployment logs on failure
         if: failure()
         run: |
@@ -157,6 +157,7 @@ jobs:
             --name $funcAppName \
             --set keyVaultReferenceIdentity=$identityId
 
+          
       - name: Show deployment logs on failure
         if: failure()
         run: |
@@ -230,7 +231,7 @@ jobs:
           az webapp update \
             --resource-group rg-otp-prod \
             --name $funcAppName \
-            --set keyVaultReferenceIdentity=$identityId
+            --set keyVaultReferenceIdentity=$identityId           
 
       - name: Show deployment logs on failure
         if: failure()
