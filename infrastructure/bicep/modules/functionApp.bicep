@@ -53,9 +53,9 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${userAssignedIdentityId}': {}
+      '${userAssignedIdentityId}':{}
+      }
     }
-  }
   properties: {
     serverFarmId: hostingPlan.id
     siteConfig: {
