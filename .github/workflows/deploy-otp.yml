@@ -55,6 +55,11 @@ jobs:
             --name deploy-otp-dev \
             --query "properties.outputs.functionAppName.value" \
             --output tsv)
+          
+          if [ -z "$funcAppName" ]; then
+            echo "Could not resolve Function App name from deployment output"
+            exit 1
+          fi
 
           az functionapp config appsettings set \
             --name $funcAppName \
@@ -69,6 +74,11 @@ jobs:
             --name deploy-otp-dev \
             --query "properties.outputs.functionAppName.value" \
             --output tsv)
+          
+          if [ -z "$funcAppName" ]; then
+            echo "Could not resolve Function App name from deployment output"
+            exit 1
+          fi          
 
           identityId=$(az identity show \
             --resource-group rg-otp-dev \
@@ -131,6 +141,11 @@ jobs:
             --name deploy-otp-test \
             --query "properties.outputs.functionAppName.value" \
             --output tsv)
+            
+          if [ -z "$funcAppName" ]; then
+            echo "Could not resolve Function App name from deployment output"
+            exit 1
+          fi            
 
           az functionapp config appsettings set \
             --name $funcAppName \
@@ -145,6 +160,11 @@ jobs:
             --name deploy-otp-test \
             --query "properties.outputs.functionAppName.value" \
             --output tsv)
+            
+          if [ -z "$funcAppName" ]; then
+            echo "Could not resolve Function App name from deployment output"
+            exit 1
+          fi            
 
           identityId=$(az identity show \
             --resource-group rg-otp-test \
@@ -207,6 +227,11 @@ jobs:
             --name deploy-otp-prod \
             --query "properties.outputs.functionAppName.value" \
             --output tsv)
+            
+          if [ -z "$funcAppName" ]; then
+            echo "Could not resolve Function App name from deployment output"
+            exit 1
+          fi            
 
           az functionapp config appsettings set \
             --name $funcAppName \
@@ -221,6 +246,11 @@ jobs:
             --name deploy-otp-prod \
             --query "properties.outputs.functionAppName.value" \
             --output tsv)
+            
+          if [ -z "$funcAppName" ]; then
+            echo "Could not resolve Function App name from deployment output"
+            exit 1
+          fi            
 
           identityId=$(az identity show \
             --resource-group rg-otp-prod \
