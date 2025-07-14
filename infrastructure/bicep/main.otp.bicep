@@ -53,6 +53,7 @@ module sqlServer 'modules/sqlServer.bicep' = {
     location: location
     administratorLogin: 'sqladminuser'
     administratorPassword: sqlAdminPassword
+    userAssignedIdentityId: managedIdentity.outputs.resourceId
   }
 }
 
