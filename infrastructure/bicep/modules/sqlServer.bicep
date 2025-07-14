@@ -21,13 +21,14 @@ resource sqlServer 'Microsoft.Sql/servers@2022-02-01-preview' = {
     type: 'UserAssigned'
     userAssignedIdentities: {
       '${userAssignedIdentityId}': {}
-    }
+    } 
   }
   properties: {
     administratorLogin: administratorLogin
     administratorLoginPassword: administratorPassword
     minimalTlsVersion: '1.2'
     publicNetworkAccess: 'Disabled' // Ensure access only through Private Endpoint if added
+    primaryUserAssignedIdentityId: userAssignedIdentityId
   }
 }
 
