@@ -16,14 +16,6 @@ param storageAccountResourceGroup string
 @description('Name of the Key Vault')
 param keyVaultName string
 
-@description('Runtime stack (e.g., dotnet)')
-@allowed([
-  'dotnet'
-  'node'
-  'python'
-])
-param runtime string = 'dotnet'
-
 @description('App Insights connection string')
 param appInsightsConnectionString string
 
