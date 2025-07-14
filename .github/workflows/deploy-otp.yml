@@ -72,7 +72,7 @@ jobs:
 
           identityId=$(az identity show \
             --resource-group rg-otp-dev \
-            --name uami-otp-dev \
+            --name uami-dev \
             --query id \
             --output tsv)
 
@@ -148,7 +148,7 @@ jobs:
 
           identityId=$(az identity show \
             --resource-group rg-otp-test \
-            --name uami-otp-test \
+            --name uami-test \
             --query id \
             --output tsv)
 
@@ -224,7 +224,7 @@ jobs:
 
           identityId=$(az identity show \
             --resource-group rg-otp-prod \
-            --name uami-otp-prod \
+            --name uami-prod \
             --query id \
             --output tsv)
 
