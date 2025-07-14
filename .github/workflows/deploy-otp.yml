@@ -80,7 +80,7 @@ jobs:
             --resource-group rg-otp-dev \
             --name $funcAppName \
             --set keyVaultReferenceIdentity=$identityId
-          
+
       - name: Show deployment logs on failure
         if: failure()
         run: |
