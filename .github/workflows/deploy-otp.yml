@@ -95,7 +95,7 @@ jobs:
             --output tsv)
 
           az keyvault secret set --vault-name $kvName --name OtpSecretKey --value "${{ secrets.OTP_SECRET }}"
-          az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD 
+          az keyvault secret set --vault-name $kvName --name SqlAdminPassword --value "${{ secrets.SQL_ADMIN_PASSWORD }}"
           
       - name: Set OtpDatabaseConnection in Azure App Settings
         if: success()
