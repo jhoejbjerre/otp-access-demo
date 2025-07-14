@@ -81,8 +81,7 @@ module functionApp 'modules/functionApp.bicep' = {
     location: location
     hostingPlanName: 'plan-${environment}'
     storageAccountName: storage.outputs.storageAccountName
-    storageAccountResourceGroup: resourceGroup().name
-    runtime: 'dotnet'
+    storageAccountResourceGroup: resourceGroup().name    
     disablePublicAccess: true
     appInsightsConnectionString: appInsights.outputs.connectionString
     keyVaultName: keyVault.outputs.keyVaultName
@@ -120,3 +119,4 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
 }
 
 output keyVaultName string = keyVault.outputs.keyVaultName
+output functionAppName string = functionApp.outputs.functionAppName
