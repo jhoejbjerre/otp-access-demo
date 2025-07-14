@@ -11,9 +11,18 @@ param administratorLogin string
 @description('Password for SQL Administrator (if required)')
 param administratorPassword string
 
+@description('Resource ID for the user assigned managed identity')
+param userAssignedIdentityId string
+
 resource sqlServer 'Microsoft.Sql/servers@2022-02-01-preview' = {
   name: name
   location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${userAssignedIdentityId}': {}
+    }
+  }
   properties: {
     administratorLogin: administratorLogin
     administratorLoginPassword: administratorPassword
