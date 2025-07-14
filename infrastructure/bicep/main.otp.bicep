@@ -121,3 +121,4 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
 
 output keyVaultName string = keyVault.outputs.keyVaultName
 output functionAppName string = functionApp.outputs.functionAppName
+output userAssignedIdentityPrincipalId string = managedIdentity.outputs.principalId
