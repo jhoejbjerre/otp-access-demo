@@ -60,6 +60,26 @@ jobs:
             --name $funcAppName \
             --resource-group rg-otp-dev \
             --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_DEV }}"
+
+      - name: Set KeyVault Reference Identity on Function App
+        if: success()
+        run: |
+          funcAppName=$(az deployment group show \
+            --resource-group rg-otp-dev \
+            --name deploy-otp-dev \
+            --query "properties.outputs.functionAppName.value" \
+            --output tsv)
+
+          identityId=$(az identity show \
+            --resource-group rg-otp-dev \
+            --name uami-otp-dev \
+            --query id \
+            --output tsv)
+
+          az webapp update \
+            --resource-group rg-otp-dev \
+            --name $funcAppName \
+            --set keyVaultReferenceIdentity=$identityId           
           
       - name: Show deployment logs on failure
         if: failure()
@@ -116,6 +136,27 @@ jobs:
             --name $funcAppName \
             --resource-group rg-otp-test \
             --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_TEST }}"
+
+      - name: Set KeyVault Reference Identity on Function App
+        if: success()
+        run: |
+          funcAppName=$(az deployment group show \
+            --resource-group rg-otp-test \
+            --name deploy-otp-test \
+            --query "properties.outputs.functionAppName.value" \
+            --output tsv)
+
+          identityId=$(az identity show \
+            --resource-group rg-otp-test \
+            --name uami-otp-test \
+            --query id \
+            --output tsv)
+
+          az webapp update \
+            --resource-group rg-otp-test \
+            --name $funcAppName \
+            --set keyVaultReferenceIdentity=$identityId
+
           
       - name: Show deployment logs on failure
         if: failure()
@@ -170,7 +211,27 @@ jobs:
           az functionapp config appsettings set \
             --name $funcAppName \
             --resource-group rg-otp-prod \
-            --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_PROD }}"          
+            --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_PROD }}"
+
+      - name: Set KeyVault Reference Identity on Function App
+        if: success()
+        run: |
+          funcAppName=$(az deployment group show \
+            --resource-group rg-otp-prod \
+            --name deploy-otp-prod \
+            --query "properties.outputs.functionAppName.value" \
+            --output tsv)
+
+          identityId=$(az identity show \
+            --resource-group rg-otp-prod \
+            --name uami-otp-prod \
+            --query id \
+            --output tsv)
+
+          az webapp update \
+            --resource-group rg-otp-prod \
+            --name $funcAppName \
+            --set keyVaultReferenceIdentity=$identityId           
 
       - name: Show deployment logs on failure
         if: failure()
