@@ -76,7 +76,7 @@ jobs:
             --query id \
             --output tsv)
 
-          az webapp update \
+          az functionapp update \
             --resource-group rg-otp-dev \
             --name $funcAppName \
             --set keyVaultReferenceIdentity=$identityId           
@@ -152,7 +152,7 @@ jobs:
             --query id \
             --output tsv)
 
-          az webapp update \
+          az functionapp update \
             --resource-group rg-otp-test \
             --name $funcAppName \
             --set keyVaultReferenceIdentity=$identityId
@@ -228,7 +228,7 @@ jobs:
             --query id \
             --output tsv)
 
-          az webapp update \
+          az functionapp update \
             --resource-group rg-otp-prod \
             --name $funcAppName \
             --set keyVaultReferenceIdentity=$identityId           
