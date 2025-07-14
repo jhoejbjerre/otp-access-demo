@@ -32,21 +32,21 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing 
 }
 
 // App Service Plan (Consumption)
-resource hostingPlan 'Microsoft.Web/serverfarms@2022-03-01' = {
+resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: hostingPlanName
   location: location
+  kind: 'functionapp,linux'
   sku: {
     name: 'Y1' // Consumption plan
     tier: 'Dynamic'
-  }
-  kind: 'functionapp,linux'
+  }  
   properties: {
     reserved: true
   }
 }
 
 // Function App with System-Assigned Managed Identity
-resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
+resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: name
   location: location
   kind: 'functionapp,linux'
@@ -57,7 +57,7 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
       }
     }
   properties: {
-    serverFarmId: hostingPlan.id
+    serverFarmId: appServicePlan.id
     siteConfig: {
       appSettings: [
         {
@@ -87,6 +87,7 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
       ]
       ftpsState: 'Disabled'
       linuxFxVersion: 'DOTNET-ISOLATED|8.0'
+      minTlsVersion: '1.2'
     }
     httpsOnly: true
     publicNetworkAccess: disablePublicAccess ? 'Disabled' : 'Enabled'
@@ -94,4 +95,3 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
 }
 
 output functionAppName string = functionApp.name
-output functionAppIdentityPrincipalId string = functionApp.identity.principalId
