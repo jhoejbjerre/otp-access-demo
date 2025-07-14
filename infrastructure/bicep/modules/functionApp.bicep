@@ -40,6 +40,9 @@ resource hostingPlan 'Microsoft.Web/serverfarms@2022-03-01' = {
     tier: 'Dynamic'
   }
   kind: 'functionapp,linux'
+  properties: {
+    reserved: true
+  }
 }
 
 // Function App with System-Assigned Managed Identity
@@ -83,6 +86,7 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
         }
       ]
       ftpsState: 'Disabled'
+      linuxFxVersion: 'DOTNET-ISOLATED|8.0'
     }
     httpsOnly: true
     publicNetworkAccess: disablePublicAccess ? 'Disabled' : 'Enabled'
