@@ -13,6 +13,9 @@ param storageAccountName string
 @description('Resource Group name of the Storage Account')
 param storageAccountResourceGroup string
 
+@description('Name of the Key Vault')
+param keyVaultName string
+
 @description('Runtime stack (e.g., dotnet)')
 @allowed([
   'dotnet'
@@ -66,7 +69,7 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
         }
         {
           name: 'FUNCTIONS_WORKER_RUNTIME'
-          value: runtime == 'dotnet' ? 'dotnet-isolated' : runtime
+          value: 'dotnet-isolated'
         }
         {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
@@ -75,6 +78,10 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: appInsightsConnectionString
+        }
+        {
+          name: 'OtpSecretKey'
+          value: '@Microsoft.KeyVault(SecretUri=https://${keyVaultName}.vault.azure.net/secrets/OtpSecretKey/)'
         }
       ]
       ftpsState: 'Disabled'

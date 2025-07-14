@@ -74,7 +74,6 @@ module appInsights 'modules/applicationInsights.bicep' = {
   }
 }
 
-
 module functionApp 'modules/functionApp.bicep' = {
   name: 'deploy-funcapp'
   params: {
@@ -86,8 +85,8 @@ module functionApp 'modules/functionApp.bicep' = {
     runtime: 'dotnet'
     disablePublicAccess: true
     appInsightsConnectionString: appInsights.outputs.connectionString
+    keyVaultName: keyVault.outputs.keyVaultName
   }
-  dependsOn: [keyVault, managedIdentity]
 }
 
 module roleAssignment 'modules/roleAssignments.bicep' = {
