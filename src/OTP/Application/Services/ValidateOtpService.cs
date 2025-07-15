@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.Commands;
+using Application.Common.Interfaces;
 using Application.Options;
 using Application.Utilities;
 using Domain.Interfaces;
@@ -20,12 +21,12 @@ public class ValidateOtpService : IValidateOtpService
     }
 
     /// <inheritdoc />
-    public async Task<bool> ValidateOtpAsync(string email, string otp, CancellationToken cancellationToken = default)
+    public async Task<bool> ValidateOtpAsync(ValidateOtpCommand command, CancellationToken cancellationToken = default)
     {
         var salt = _options.OtpSecretKey;
-        var hashedOtp = OtpHasher.HashOtpWithSalt(otp, salt);
+        var hashedOtp = OtpHasher.HashOtpWithSalt(command.OtpCode, salt);
 
-        var success = await _repository.MarkAsUsedAsync(email, hashedOtp, cancellationToken);
+        var success = await _repository.MarkAsUsedAsync(command.Email, hashedOtp, cancellationToken);
         await _repository.SaveChangesAsync(cancellationToken);
 
         return success;

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35521.163 d17.12
+VisualStudioVersion = 17.12.35521.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{104AEBBA-2E39-4BFA-B36A-1ABFCFC43653}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{686433BF-B9F8-418D-B936-52EA58A8B843}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtpAccess.Functions.OtpApi", "OtpAccess.Functions.OtpApi\OtpAccess.Functions.OtpApi.csproj", "{EEC6B2D3-3761-4371-B424-4293B638B3AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtpValidate.Functions.OtpApi", "OtpValidate.Functions.OtpApi\OtpValidate.Functions.OtpApi.csproj", "{BB234299-64EE-45D7-941D-C7421F2E453C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,11 +37,16 @@ Global
 		{EEC6B2D3-3761-4371-B424-4293B638B3AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EEC6B2D3-3761-4371-B424-4293B638B3AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EEC6B2D3-3761-4371-B424-4293B638B3AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB234299-64EE-45D7-941D-C7421F2E453C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB234299-64EE-45D7-941D-C7421F2E453C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB234299-64EE-45D7-941D-C7421F2E453C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB234299-64EE-45D7-941D-C7421F2E453C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{EEC6B2D3-3761-4371-B424-4293B638B3AA} = {686433BF-B9F8-418D-B936-52EA58A8B843}
+		{BB234299-64EE-45D7-941D-C7421F2E453C} = {686433BF-B9F8-418D-B936-52EA58A8B843}
 	EndGlobalSection
 EndGlobal
