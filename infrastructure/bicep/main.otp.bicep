@@ -86,6 +86,15 @@ module network 'modules/network.bicep' = {
   }
 }
 
+module privateDnsZone 'modules/privateDnsZone.bicep' = {
+  name: 'deploy-private-dns-zone'
+  params: {
+    location: 'global'
+    environment: environment
+    vnetResourceId: network.outputs.vnetId
+  }
+}
+
 module functionApp 'modules/functionApp.bicep' = {
   name: 'deploy-funcapp'
   params: {
@@ -127,3 +136,4 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
 output keyVaultName string = keyVault.outputs.keyVaultName
 output functionAppName string = functionApp.outputs.functionAppName
 output userAssignedIdentityPrincipalId string = managedIdentity.outputs.principalId
+output privateDnsZoneId string = privateDnsZone.outputs.privateDnsZoneId
