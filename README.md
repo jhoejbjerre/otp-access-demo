@@ -17,7 +17,7 @@ The solution is designed as a Proof of Concept (PoC).
   Guarantees that OTPs cannot be reused.
 
 - **Tied to a user or resource-specific context (Email and OptCode)**  
-  OTPs are scoped to a specific context to prevent misuse. So they can be validated as valid and then used once and then they will be marked as IsUsed
+  OTPs are scoped to a specific context for security to prevent misuse. So they can be validated as valid and then used once and then they will be marked as IsUsed
   
 - **Validation via Entity Framework Core with Azure SQL Database**  
   Secure and reliable persistence of OTP data.
@@ -104,10 +104,6 @@ The pipeline deploys sequentially through environments (Dev → Test → Prod) w
 
 - [ ] **Offline / Resilient Design (Future)**  
       Instead of device-based offline support, resilience can be achieved through Azure-native features such as SQL Geo-replication, zone-redundant storage and cross-region deployment.
-
-- [ ] **Validation Context (SessionId / Resource binding)**  
-      Ensure all OTPs are scoped to a specific, valid user/session/resource context for security.
-
 ---
 
 ## 📂 Project Structure
