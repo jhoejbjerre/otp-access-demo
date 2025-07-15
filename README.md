@@ -1,3 +1,6 @@
+```markdown
+![CI/CD](https://github.com/jhoejbjerre/otp-access-demo/actions/workflows/deploy-otp.yml/badge.svg)
+
 # OTP Access Demo
 
 This project implements a simple and secure one-time password (OTP) system using Clean Architecture and .NET 8. The solution is designed as a Proof of Concept (PoC).
@@ -50,9 +53,22 @@ This project implements a simple and secure one-time password (OTP) system using
 
 - **CI/CD with GitHub Actions**  
   Multi-environment pipelines supporting validation, sequential deployments, and manual approvals.  
-  **TODO:** Finalize production pipeline incl. manual approvals.
+  **TODO:** Finalize production pipeline incl. manual approvals. 
 
 ---
+
+## 🔄 CI/CD Pipeline Overview
+
+This project uses GitHub Actions for continuous integration and deployment (CI/CD).  
+The pipeline deploys sequentially through environments (Dev → Test → Prod) with manual approval required for Test and Prod.
+
+### Deployment Flow:
+
++------------+     +-------------+     +-------------+
+|  deploy-dev| --> |  deploy-test| --> |  deploy-prod |
++------------+     +-------------+     +-------------+
+       ✅               🔶 (manual)         🔶 (manual)
+
 
 ## 📝 Design Principles
 
