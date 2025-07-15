@@ -114,20 +114,26 @@ The pipeline deploys sequentially through environments (Dev → Test → Prod) w
 
 ```text
 otp-access-demo/
-├── src/                             # Clean Architecture projects
-│   ├── OtpAccess.Functions.OtpApi/  # Azure Function API (.NET 8 isolated)
-│   ├── Application/                 # Application Layer (Business Logic)
-│   ├── Domain/                      # Domain Layer (Entities, Interfaces)
-│   └── Infrastructure/              # Infrastructure Layer (EF Core, Repositories)
-├── infrastructure/                  # Azure Bicep IaC templates
+├── src/                                  # Clean Architecture projects
+│   ├── OtpAccess.Functions.OtpApi/       # Azure Function API for OTP generation (.NET 8 isolated)
+│   ├── OtpValidate.Functions.OtpApi/     # Azure Function API for OTP validation (.NET 8 isolated)
+│   ├── OtpAccess.Functions.OtpApi.Tests/ # Unit tests for OtpAccess.Functions.OtpApi
+│   ├── Application/                      # Application Layer (Business Logic)
+│   ├── Domain/                           # Domain Layer (Entities, Interfaces)
+│   │   ├── Common/                       # Shared base entities (e.g., BaseEntity)
+│   │   ├── Entities/                     # Domain entities (e.g., OtpRequest)
+│   │   └── Interfaces/                   # Domain interfaces (e.g., repository contracts)
+│   └── Infrastructure/                   # Infrastructure Layer (EF Core, Repositories)
+├── infrastructure/                       # Azure Bicep IaC templates
 │   ├── main.bicep
 │   ├── main.otp.bicep
-│   ├── env/                         # Environment parameter files
+│   ├── env/                              # Environment parameter files
 │   │   ├── dev/
 │   │   ├── test/
 │   │   └── prod/
-│   └── modules/                     # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
+│   └── modules/                          # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
 ├── .github/
-│   └── workflows/                   # GitHub Actions CI/CD pipeline files
+│   └── workflows/                        # GitHub Actions CI/CD pipeline files
 │       └── deploy-otp.yml
-├── README.md                        # Project overview and instructions
+├── README.md                             # Project overview and instructions
+
