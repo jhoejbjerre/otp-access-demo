@@ -75,6 +75,26 @@ module appInsights 'modules/applicationInsights.bicep' = {
   }
 }
 
+module network 'modules/network.bicep' = {
+  name: 'deploy-network'
+  params: {
+    environment: environment
+    location: location
+    addressSpace: '10.10.0.0/16'
+    privateEndpointSubnetPrefix: '10.10.0.0/24'
+    functionAppSubnetPrefix: '10.10.1.0/27'
+  }
+}
+
+module privateDnsZone 'modules/privateDnsZone.bicep' = {
+  name: 'deploy-private-dns-zone'
+  params: {
+    location: 'global'
+    environment: environment
+    vnetResourceId: network.outputs.vnetId
+  }
+}
+
 module functionApp 'modules/functionApp.bicep' = {
   name: 'deploy-funcapp'
   params: {
@@ -87,6 +107,7 @@ module functionApp 'modules/functionApp.bicep' = {
     appInsightsConnectionString: appInsights.outputs.connectionString
     keyVaultName: keyVault.outputs.keyVaultName
     userAssignedIdentityId: managedIdentity.outputs.resourceId
+    subnetResourceId: network.outputs.functionAppSubnetId
   }
 }
 
@@ -100,20 +121,12 @@ module roleAssignment 'modules/roleAssignments.bicep' = {
   dependsOn: [keyVault]
 }
 
-module network 'modules/network.bicep' = {
-  name: 'deploy-network'
-  params: {
-    location: location
-    environment: environment
-  }
-}
-
 module privateEndpoint 'modules/privateEndpoint.bicep' = {
   name: 'deploy-pe'
   params: {
     name: 'pe-${environment}'
     location: location
-    subnetId: network.outputs.subnetId
+    subnetId: network.outputs.privateEndpointSubnetId
     privateLinkResourceId: sqlServer.outputs.sqlServerId
     groupId: 'sqlServer'
     subresourceName: 'sqlServer'
@@ -123,3 +136,4 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
 output keyVaultName string = keyVault.outputs.keyVaultName
 output functionAppName string = functionApp.outputs.functionAppName
 output userAssignedIdentityPrincipalId string = managedIdentity.outputs.principalId
+output privateDnsZoneId string = privateDnsZone.outputs.privateDnsZoneId

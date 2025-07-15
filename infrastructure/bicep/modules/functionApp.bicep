@@ -25,6 +25,9 @@ param disablePublicAccess bool = true
 @description('User Assigned Identity Id')
 param userAssignedIdentityId string
 
+@description('Name of the subnet')
+param subnetResourceId string
+
 // Reference to existing Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
@@ -58,6 +61,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     }
   properties: {
     serverFarmId: appServicePlan.id
+    virtualNetworkSubnetId: subnetResourceId
     siteConfig: {
       appSettings: [
         {
@@ -86,7 +90,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
         }
       ]
       ftpsState: 'Disabled'
-      linuxFxVersion: 'DOTNET-ISOLATED|8.0'
+      linuxFxVersion: 'DOTNET-ISOLATED|8.0'      
       minTlsVersion: '1.2'
     }
     httpsOnly: true

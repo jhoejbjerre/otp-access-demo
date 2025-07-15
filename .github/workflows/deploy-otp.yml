@@ -22,11 +22,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}     
 
-      - name: Create Resource Groups (subscription level)
+      - name: Create resource groups
         run: |
           az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-dev --parameters environment=dev
 
-      - name: Deploy OTP resources (resource group level)
+      - name: Deploy resources
         run: |
           az deployment group create --name deploy-otp-dev --resource-group rg-otp-dev --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/dev/main.otp.dev.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"         
                 
@@ -113,11 +113,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}      
       
-      - name: Create Resource Groups (subscription level)
+      - name: Create resource groups
         run: |
           az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-test --parameters environment=test
 
-      - name: Deploy OTP resources (resource group level)
+      - name: Deploy resources
         run: |
           az deployment group create --name deploy-otp-test --resource-group rg-otp-test --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/test/main.otp.test.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
           
@@ -199,11 +199,11 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
             
-      - name: Create Resource Groups (subscription level)
+      - name: Create resource groups
         run: |
           az deployment sub create --template-file infrastructure/bicep/main.bicep --location=westeurope --name deploy-rg-prod --parameters environment=prod
 
-      - name: Deploy OTP resources (resource group level)
+      - name: Deploy resources
         run: |
           az deployment group create --name deploy-otp-prod --resource-group rg-otp-prod --template-file infrastructure/bicep/main.otp.bicep --parameters @infrastructure/bicep/env/prod/main.otp.prod.parameters.json --parameters sqlAdminPassword="${{ secrets.SQL_ADMIN_PASSWORD }}" --parameters githubSpObjectId="${{ secrets.SP_OBJECT_ID_GITHUB }}"
           

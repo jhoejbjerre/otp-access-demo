@@ -1,0 +1,14 @@
+{
+  "analyzers": {
+    "core": {
+      "verboseRules": true,
+      "enabledRules": [
+        "no-unused-params",
+        "no-unused-variables"
+      ],
+      "disabledRules": [
+        "no-hardcoded-env-urls"
+      ]
+    }
+  }
+}
