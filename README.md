@@ -56,9 +56,22 @@ This project implements a simple and secure one-time password (OTP) system using
 - Follows Clean Architecture principles to ensure separation of concerns, maintainability, and testability.
 - Uses Entity Framework Core for data access and Azure SQL Database for persistence.
 - Infrastructure is provisioned through Azure Bicep for consistent dev/test/prod environments.
-- Secrets management via Azure Key Vault.
+- Secrets management:
+  - GitHub Secrets are used to store Service Principal credentials for pipeline deployments.
+  - A User-Assigned Managed Identity (UAMI) is used by the Function App for runtime access to Azure resources (Key Vault, SQL).
 - Hosted as Azure Function App (.NET 8 isolated worker model) for scalability and low operational cost.
 - GitHub Actions handles CI/CD pipelines with environment-specific deployment.
+
+---
+
+## 🔐 Security & Access Control
+
+- **Deployment Identity:**  
+  GitHub Actions uses a Service Principal (stored securely via GitHub Secrets) to deploy Azure resources through Bicep.
+
+- **Runtime Identity:**  
+  The Azure Function App uses a **User-Assigned Managed Identity (UAMI)** to access protected resources (e.g., Key Vault, Azure SQL Database).  
+  No secrets are stored in code or in the Function App configuration.
 
 ---
 
