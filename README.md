@@ -102,7 +102,8 @@ The pipeline deploys sequentially through environments (Dev → Test → Prod) w
       A timer-triggered Azure Function will be implemented to perform regular cleanup of expired OTP records from the database. This ensures that the dataset remains clean and only contains active, relevant entries.
 
 - [ ] **Offline / Resilient Design (Future)**  
-      Instead of device-based offline support, resilience can be achieved through Azure-native features such as SQL Geo-replication, zone-redundant storage and cross-region deployment.
+      Instead of device-based offline support, resilience can be achieved through Azure-native features
+      such as SQL Geo-replication, zone-redundant storage and cross-region deployment.
 ---
 
 ## 📂 Project Structure
