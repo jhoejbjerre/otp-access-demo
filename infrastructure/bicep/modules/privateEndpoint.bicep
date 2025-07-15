@@ -37,28 +37,23 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
         }
       }
     ]
-    privateDnsZoneGroups: [
+  }
+}
+
+resource peDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-09-01' = {
+  name: 'default'
+  parent: privateEndpoint
+  properties: {
+    privateDnsZoneConfigs: [
       {
-        name: 'default'
+        name: 'privatelink.database.windows.net'
         properties: {
-          privateDnsZoneConfigs: [
-            {
-              name: 'privatelink.database.windows.net'
-              properties: {
-                privateDnsZoneId: privateDnsZoneId
-              }
-            }
-          ]
+          privateDnsZoneId: privateDnsZoneId
         }
       }
     ]
   }
 }
 
-resource nic 'Microsoft.Network/networkInterfaces@2022-09-01' existing = {
-  name: '${name}.nic.0'
-}
-
 output privateEndpointId string = privateEndpoint.id
-output privateEndpointIpAddress string = nic.properties.ipConfigurations[0].properties.privateIPAddress
-
+output networkInterfaceId string = privateEndpoint.properties.networkInterfaces[0].id
