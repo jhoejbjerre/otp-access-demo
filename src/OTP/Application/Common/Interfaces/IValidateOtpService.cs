@@ -1,4 +1,6 @@
-﻿namespace Application.Interfaces;
+﻿using Application.Commands;
+
+namespace Application.Common.Interfaces;
 
 /// <summary>
 ///     Abstraction for validating and consuming one-time passwords (OTPs).
@@ -6,12 +8,11 @@
 public interface IValidateOtpService
 {
     /// <summary>
-    ///     Validates an OTP by email and raw code.
+    ///     Validates an OTP by email and OTP code to see is this is a valid password in a given login session.
     ///     If valid, the OTP is marked as used.
     /// </summary>
-    /// <param name="email">The email address associated with the OTP.</param>
-    /// <param name="otp">The plain-text OTP submitted by the user.</param>
+    /// <param name="command">The command containing the email address and one-time password (OTP) to validate.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>True if the OTP was valid and successfully marked as used; otherwise, false.</returns>
-    Task<bool> ValidateOtpAsync(string email, string otp, CancellationToken cancellationToken = default);
+    Task<bool> ValidateOtpAsync(ValidateOtpCommand command, CancellationToken cancellationToken = default);
 }

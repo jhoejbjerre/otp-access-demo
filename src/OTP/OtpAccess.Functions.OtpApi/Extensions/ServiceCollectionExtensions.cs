@@ -13,7 +13,6 @@ public static class ServiceCollectionExtensions
     {
         serviceCollection.AddScoped<IGenerateOtpCommandFactory, GenerateOtpCommandFactory>();
         serviceCollection.AddScoped<IGenerateOtpService, GenerateOtpService>();
-        serviceCollection.AddScoped<IValidateOtpService, ValidateOtpService>();
 
         serviceCollection.Configure<OtpOptions>(configuration.GetSection("OtpOptions"));
 
