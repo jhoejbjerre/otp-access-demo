@@ -16,6 +16,17 @@ param sqlAdminPassword string
 
 var storageAccountName = toLower('stotp${environment}${uniqueString(resourceGroup().id)}')
 
+module network 'modules/network.bicep' = {
+  name: 'deploy-network'
+  params: {
+    environment: environment
+    location: location
+    addressSpace: '10.10.0.0/16'
+    privateEndpointSubnetPrefix: '10.10.0.0/24'
+    functionAppSubnetPrefix: '10.10.1.0/27'
+  }
+}
+
 module storage 'modules/storageAccount.bicep' = {
   name: 'deploy-storage'
   params: {
@@ -74,17 +85,6 @@ module appInsights 'modules/applicationInsights.bicep' = {
   }
 }
 
-module network 'modules/network.bicep' = {
-  name: 'deploy-network'
-  params: {
-    environment: environment
-    location: location
-    addressSpace: '10.10.0.0/16'
-    privateEndpointSubnetPrefix: '10.10.0.0/24'
-    functionAppSubnetPrefix: '10.10.1.0/27'
-  }
-}
-
 module privateEndpoint 'modules/privateEndpoint.bicep' = {
   name: 'deploy-pe'
   params: {
@@ -107,6 +107,19 @@ module privateDnsZone 'modules/privateDnsZone.bicep' = {
   }
 }
 
+module privateEndpoint 'modules/privateEndpoint.bicep' = {
+  name: 'deploy-pe'
+  params: {
+    name: 'pe-${environment}'
+    location: location
+    subnetId: network.outputs.privateEndpointSubnetId
+    privateLinkResourceId: sqlServer.outputs.sqlServerId
+    groupId: 'sqlServer'
+    subresourceName: 'sqlServer'
+    privateDnsZoneId: privateDnsZone.outputs.privateDnsZoneId
+  }
+}
+
 module functionApp 'modules/functionApp.bicep' = {
   name: 'deploy-funcapp'
   params: {
@@ -121,6 +134,9 @@ module functionApp 'modules/functionApp.bicep' = {
     userAssignedIdentityId: managedIdentity.outputs.resourceId
     subnetResourceId: network.outputs.functionAppSubnetId
   }
+  dependsOn: [
+    privateDnsZone
+  ]
 }
 
 module roleAssignment 'modules/roleAssignments.bicep' = {
