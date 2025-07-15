@@ -19,10 +19,9 @@ The solution is designed as a Proof of Concept (PoC).
 - **One-time use enforcement**  
   Guarantees that OTPs cannot be reused.
 
-- **Tied to a user or resource-specific context (e.g., SessionId or Email)**  
-  OTPs are scoped to a specific context to prevent misuse.  
-  **TODO:** Ensure validation is fully context-aware if not already in place.
-
+- **Tied to a user or resource-specific context (Email and OptCode)**  
+  OTPs are scoped to a specific context to prevent misuse. So they can be validated as valid and then used once and then they will be marked as IsUsed
+  
 - **Validation via Entity Framework Core with Azure SQL Database**  
   Secure and reliable persistence of OTP data.
 
