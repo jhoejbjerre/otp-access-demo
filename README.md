@@ -4,26 +4,52 @@ This project implements a simple and secure one-time password (OTP) system using
 
 ## ✅ Features
 
-- 6-digit numeric OTP generation  
-  Easy to input manually and unique per request.
-- OTP validity of 10 minutes  
-  Ensures temporary and time-limited access.
-- One-time use enforcement  
-  Prevents reuse of the same code.
-- Tied to SessionId or resource/user reference  
-  OTPs are bound to a valid context for security.
-- Validation via Entity Framework Core with Azure SQL Database  
-  Provides reliable data access and persistence.
-- Logging and cleanup of expired OTPs  
-  Maintains auditability and system hygiene.
-- Optional rate limiting support  
-  Middleware-based or leveraging Azure-native rate limiting resources.
-- Infrastructure as Code with Azure Bicep  
-  Deploys resources for Function App, Key Vault, SQL, Storage, Networking, and RBAC.
-- Azure Functions hosted on Linux Consumption Plan  
-  Using .NET 8 isolated worker model for cost-effective and scalable hosting.
-- GitHub Actions CI/CD pipeline  
-  Supports multi-environment deployment with validation, sequential jobs, and manual gates.
+- **6-digit numeric OTP generation**  
+  User-friendly and easy to input manually. Ensures uniqueness per request.
+
+- **OTP validity of 10 minutes**  
+  Enforces temporary and time-limited access for enhanced security.
+
+- **One-time use enforcement**  
+  Guarantees that OTPs cannot be reused.
+
+- **Tied to a user or resource-specific context (e.g., SessionId or Email)**  
+  OTPs are scoped to a specific context to prevent misuse.  
+  **TODO:** Ensure validation is context-aware if not already in place.
+
+- **Validation via Entity Framework Core with Azure SQL Database**  
+  Secure and reliable persistence of OTP data.
+
+- **Logging and cleanup of expired OTPs**  
+  Ensures auditability and keeps the dataset clean over time.  
+  **TODO:** Implement scheduled cleanup job.
+
+- **Optional rate limiting support**  
+  **TODO:** Implement middleware-based throttling or Azure-native rate limiting (e.g., API Management or Front Door with rate limit policies).
+
+---
+
+## ✅ Infrastructure & Deployment
+
+- **Infrastructure as Code (IaC) with Azure Bicep**  
+  Automates deployment of resources including Function App, Key Vault, SQL, Storage, Networking, and RBAC.
+
+- **Azure Functions on Linux Consumption Plan (.NET 8 isolated worker model)**  
+  Cost-effective, scalable, and aligned with modern .NET best practices.
+
+- **CI/CD with GitHub Actions**  
+  Multi-environment pipelines supporting validation, sequential deployments, and manual approvals.  
+  **TODO:** Review and finalize production pipeline incl. approvals.
+
+---
+
+## 📝 TODO / Backlog
+
+- Implement context-aware OTP validation (SessionId, UserId)
+- Implement cleanup of expired OTPs (timer-triggered function or similar)
+- Implement rate limiting (middleware or Azure-native)
+- Finalize GitHub Actions pipelines for production
+
 
 ## 📂 Project Structure
 
