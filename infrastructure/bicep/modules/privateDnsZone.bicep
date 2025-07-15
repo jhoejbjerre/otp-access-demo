@@ -12,7 +12,6 @@ param privateEndpointIpAddress string
 
 var dnsZoneName = 'privatelink.database.windows.net'
 
-
 resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   name: dnsZoneName
   location: location
