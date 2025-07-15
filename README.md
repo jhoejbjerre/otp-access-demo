@@ -63,11 +63,10 @@ The pipeline deploys sequentially through environments (Dev → Test → Prod) w
 
 ### Deployment Flow:
 
-+------------+     +-------------+     +-------------+
-|  deploy-dev| --> |  deploy-test| --> |  deploy-prod |
-+------------+     +-------------+     +-------------+
-       ✅               🔶 (manual)         🔶 (manual)
-
+```mermaid
+flowchart LR
+    A[deploy-dev ✅] --> B[deploy-test 🔶 (manual)]
+    B --> C[deploy-prod 🔶 (manual)]
 
 ## 📝 Design Principles
 
