@@ -46,6 +46,12 @@ The solution is designed as a Proof of Concept (PoC).
 
 - **Azure Functions on Linux Consumption Plan (.NET 8 isolated worker model)**  
   Cost-effective, scalable, and aligned with modern .NET best practices.
+  **TODO:** Improve HTTP response standards for OTP validation  
+- Return `200 OK` only on successful validation.  
+- Return `400 Bad Request` for invalid input (missing email or OTP).  
+- Return `404 Not Found` when OTP is not found or expired.  
+- Return `409 Conflict` if OTP has already been used.  
+- Return `500 Internal Server Error` on unhandled exceptions.
 
 - **Application Insights integration for logging and monitoring**  
   All OTP-related operations are logged via ILogger, with telemetry automatically routed to Azure Application Insights.
