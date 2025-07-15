@@ -7,6 +7,9 @@ param environment string
 @description('VNet Resource ID to link the Private DNS Zone')
 param vnetResourceId string
 
+@description('Private Endpoint IP Address for SQL Server')
+param privateEndpointIpAddress string
+
 var dnsZoneName = 'privatelink.database.windows.net'
 
 
@@ -24,6 +27,19 @@ resource vnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06
       id: vnetResourceId
     }
     registrationEnabled: false
+  }
+}
+
+resource sqlARecord 'Microsoft.Network/privateDnsZones/A@2020-06-01' = {
+  name: 'sql-${environment}' // sql-dev
+  parent: privateDnsZone
+  properties: {
+    ttl: 3600
+    aRecords: [
+      {
+        ipv4Address: privateEndpointIpAddress
+      }
+    ]
   }
 }
 

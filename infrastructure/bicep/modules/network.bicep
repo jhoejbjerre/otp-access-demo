@@ -26,6 +26,11 @@ resource vnet 'Microsoft.Network/virtualNetworks@2022-09-01' = {
         addressSpace
       ]
     }
+      dhcpOptions: {
+      dnsServers: [
+        '168.63.129.16'
+      ]
+    }
     subnets: [
       {
         name: peSubnetName
