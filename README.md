@@ -1,6 +1,3 @@
-```markdown
-![CI/CD](https://github.com/jhoejbjerre/otp-access-demo/actions/workflows/deploy-otp.yml/badge.svg)
-
 # OTP Access Demo
 
 This project implements a simple and secure one-time password (OTP) system using Clean Architecture and .NET 8.
