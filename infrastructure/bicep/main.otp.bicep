@@ -109,9 +109,28 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
 }
 
 module functionApp 'modules/functionApp.bicep' = {
-  name: 'deploy-funcapp'
+  name: 'deploy-funcapp-generate'
   params: {
-    name: 'func-otp-${environment}-${uniqueSuffix}'
+    name: 'func-otp-generate-${environment}-${uniqueSuffix}'
+    location: location
+    hostingPlanName: 'plan-${environment}'
+    storageAccountName: storage.outputs.storageAccountName
+    storageAccountResourceGroup: resourceGroup().name    
+    disablePublicAccess: true
+    appInsightsConnectionString: appInsights.outputs.connectionString
+    keyVaultName: keyVault.outputs.keyVaultName
+    userAssignedIdentityId: managedIdentity.outputs.resourceId
+    subnetResourceId: network.outputs.functionAppSubnetId
+  }
+  dependsOn: [
+    privateDnsZone
+  ]
+}
+
+module validateFunctionApp 'modules/functionApp.bicep' = {
+  name: 'deploy-funcapp-validate'
+  params: {
+    name: 'func-otp-validate-${environment}-${uniqueSuffix}'
     location: location
     hostingPlanName: 'plan-${environment}'
     storageAccountName: storage.outputs.storageAccountName
