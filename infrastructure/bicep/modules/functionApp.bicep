@@ -40,8 +40,8 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   location: location
   kind: 'functionapp,linux'
   sku: {
-    name: 'Y1' // Consumption plan
-    tier: 'Dynamic'
+    name: 'EP1'
+    tier: 'ElasticPremium'
   }  
   properties: {
     reserved: true
