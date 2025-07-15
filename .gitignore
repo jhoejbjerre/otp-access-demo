@@ -7,6 +7,7 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/Dotnet.gitignore
 
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -52,4 +53,39 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Infrastructure files that should not be committed
 /infrastructure/bicep/main.otp.json
+
+# Visual Studio
+**/.vs/
+**/*.suo
+**/*.vscode/
+**/*.user
+**/*.dtbcache.*
+**/*.vsidx
+**/*.cache
+
+# Azure Function local settings
+local.settings.json
+
+# Azure Publish Profiles
+Properties/PublishProfiles/
+Properties/ServiceDependencies/
+
+# Azure Function Publish Profiles (duplicate naming variants)
+**/Properties/PublishProfiles/
+**/Properties/ServiceDependencies/
+**/Properties/*.pubxml
+**/Properties/*.json
+
+# Build output
+bin/
+obj/
+
+# Rider / JetBrains (if relevant)
+.idea/
+
+# Mac OS / Windows artifacts
+.DS_Store
+Thumbs.db
