@@ -100,7 +100,7 @@ The pipeline deploys sequentially through environments (Dev → Test → Prod) w
       Consider Azure Front Door, API Management, or middleware-based solutions for throttling and IP-based rate limiting.
 
 - [ ] **Scheduled Cleanup of Expired OTPs**  
-      Implement a timer-triggered Function to remove expired codes regularly.
+      A timer-triggered Azure Function will be implemented to perform regular cleanup of expired OTP records from the database. This ensures that the dataset remains clean and only contains active, relevant entries.
 
 - [ ] **Offline / Resilient Design (Future)**  
       Could be expanded with local caching or device-based OTPs for offline use scenarios.
