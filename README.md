@@ -60,6 +60,7 @@ The solution is designed as a Proof of Concept (PoC).
 
 This project uses GitHub Actions for continuous integration and deployment (CI/CD).  
 The pipeline deploys sequentially through environments (Dev → Test → Prod) with manual approval required for Test and Prod.
+Deployed under one subscription for the POC in separate resource groups for each environment
 
 ### Deployment Flow:
 ```markdown
@@ -67,6 +68,8 @@ The pipeline deploys sequentially through environments (Dev → Test → Prod) w
 | deploy-dev | --> | deploy-test | --> | deploy-prod |
 +------------+     +-------------+     +-------------+
      ✅              🔶 (manual)        🔶 (manual)
+
+**TODO:** Finalize test and prod
 
 ## 📝 Design Principles
 
