@@ -16,6 +16,9 @@ param subresourceName string
 @description('Optional group ID override (some resources require specific group IDs)')
 param groupId string = subresourceName
 
+@description('Resource ID of the Private DNS Zone to bind for this Private Endpoint')
+param privateDnsZoneId string
+
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
   name: name
   location: location
@@ -34,13 +37,22 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
         }
       }
     ]
+    privateDnsZoneGroups: [
+      {
+        name: 'default'
+        properties: {
+          privateDnsZoneConfigs: [
+            {
+              name: 'privatelink.database.windows.net'
+              properties: {
+                privateDnsZoneId: privateDnsZoneId
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }
 
-resource nic 'Microsoft.Network/networkInterfaces@2022-09-01' existing = {
-  name: '${name}.nic.0'
-}
-
 output privateEndpointId string = privateEndpoint.id
-output privateEndpointIpAddress string = nic.properties.ipConfigurations[0].properties.privateIPAddress
-

@@ -16,6 +16,17 @@ param sqlAdminPassword string
 
 var storageAccountName = toLower('stotp${environment}${uniqueString(resourceGroup().id)}')
 
+module network 'modules/network.bicep' = {
+  name: 'deploy-network'
+  params: {
+    environment: environment
+    location: location
+    addressSpace: '10.10.0.0/16'
+    privateEndpointSubnetPrefix: '10.10.0.0/24'
+    functionAppSubnetPrefix: '10.10.1.0/27'
+  }
+}
+
 module storage 'modules/storageAccount.bicep' = {
   name: 'deploy-storage'
   params: {
@@ -74,14 +85,12 @@ module appInsights 'modules/applicationInsights.bicep' = {
   }
 }
 
-module network 'modules/network.bicep' = {
-  name: 'deploy-network'
+module privateDnsZone 'modules/privateDnsZone.bicep' = {
+  name: 'deploy-private-dns-zone'
   params: {
+    location: 'global'
     environment: environment
-    location: location
-    addressSpace: '10.10.0.0/16'
-    privateEndpointSubnetPrefix: '10.10.0.0/24'
-    functionAppSubnetPrefix: '10.10.1.0/27'
+    vnetResourceId: network.outputs.vnetId
   }
 }
 
@@ -94,16 +103,7 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
     privateLinkResourceId: sqlServer.outputs.sqlServerId
     groupId: 'sqlServer'
     subresourceName: 'sqlServer'
-  }  
-}
-
-module privateDnsZone 'modules/privateDnsZone.bicep' = {
-  name: 'deploy-private-dns-zone'
-  params: {
-    location: 'global'
-    environment: environment
-    vnetResourceId: network.outputs.vnetId
-    privateEndpointIpAddress: privateEndpoint.outputs.privateEndpointIpAddress
+    privateDnsZoneId: privateDnsZone.outputs.privateDnsZoneId
   }
 }
 
@@ -121,6 +121,9 @@ module functionApp 'modules/functionApp.bicep' = {
     userAssignedIdentityId: managedIdentity.outputs.resourceId
     subnetResourceId: network.outputs.functionAppSubnetId
   }
+  dependsOn: [
+    privateDnsZone
+  ]
 }
 
 module roleAssignment 'modules/roleAssignments.bicep' = {
