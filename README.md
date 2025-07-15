@@ -2,6 +2,8 @@
 
 This project implements a simple and secure one-time password (OTP) system using Clean Architecture and .NET 8. The solution is designed as a Proof of Concept (PoC).
 
+---
+
 ## ✅ Features
 
 - **6-digit numeric OTP generation**  
@@ -15,7 +17,7 @@ This project implements a simple and secure one-time password (OTP) system using
 
 - **Tied to a user or resource-specific context (e.g., SessionId or Email)**  
   OTPs are scoped to a specific context to prevent misuse.  
-  **TODO:** Ensure validation is context-aware if not already in place.
+  **TODO:** Ensure validation is fully context-aware if not already in place.
 
 - **Validation via Entity Framework Core with Azure SQL Database**  
   Secure and reliable persistence of OTP data.
@@ -25,7 +27,13 @@ This project implements a simple and secure one-time password (OTP) system using
   **TODO:** Implement scheduled cleanup job.
 
 - **Optional rate limiting support**  
-  **TODO:** Implement middleware-based throttling or Azure-native rate limiting (e.g., API Management or Front Door with rate limit policies).
+  **TODO:** Implement middleware-based throttling or Azure-native rate limiting (e.g., API Management or Front Door policies).
+
+- **Clean Architecture structure for maintainability**  
+  Ensures separation between Domain, Application, Infrastructure, and API layers.
+
+- **Brute-force prevention planned via Azure-native or middleware-based solutions**  
+  **TODO:** Evaluate rate-limiting options (Azure Front Door, API Management, custom middleware).
 
 ---
 
@@ -39,7 +47,9 @@ This project implements a simple and secure one-time password (OTP) system using
 
 - **CI/CD with GitHub Actions**  
   Multi-environment pipelines supporting validation, sequential deployments, and manual approvals.  
-  **TODO:** Review and finalize production pipeline incl. approvals.
+  **TODO:** Finalize production pipeline incl. manual approvals.
+
+---
 
 ## 📝 Design Principles
 
@@ -47,50 +57,48 @@ This project implements a simple and secure one-time password (OTP) system using
 - Uses Entity Framework Core for data access and Azure SQL Database for persistence.
 - Infrastructure is provisioned through Azure Bicep for consistent dev/test/prod environments.
 - Secrets management via Azure Key Vault.
-- Hosted as Azure Function App (.NET 8 isolated) for scalability and low operational cost.
+- Hosted as Azure Function App (.NET 8 isolated worker model) for scalability and low operational cost.
 - GitHub Actions handles CI/CD pipelines with environment-specific deployment.
 
 ---
 
-## 🚧 Known Gaps / TODOs / backlog
+## 🚧 Known Gaps / TODOs / Backlog
 
-- **Rate Limiting & Brute Force Protection**  
-  Consider using Azure Front Door, API Management, or a middleware-based solution for throttling and IP-based rate limiting.
+- [ ] **Rate Limiting & Brute Force Protection**  
+      Consider Azure Front Door, API Management, or middleware-based solutions for throttling and IP-based rate limiting.
 
-- **Audit Logging (Long-Term Storage)**  
-  Store audit logs (requests, validations) in Azure Storage or Application Insights for long-term retention and analysis.
+- [ ] **Audit Logging (Long-Term Storage)**  
+      Store audit logs (requests, validations) in Azure Storage or Application Insights for long-term retention and analysis.
 
-- **Scheduled Cleanup of Expired OTPs**  
-  Implement a timer-triggered Function to remove expired codes regularly.
+- [ ] **Scheduled Cleanup of Expired OTPs**  
+      Implement a timer-triggered Function to remove expired codes regularly.
 
-- **Offline / Resilient Design (Future)**  
-  Could be expanded with local caching / device-based OTPs for offline use scenarios.
+- [ ] **Offline / Resilient Design (Future)**  
+      Could be expanded with local caching or device-based OTPs for offline use scenarios.
 
-- **Validation Context (SessionId / Resource binding)**  
-  Ensure all OTPs are scoped to a specific, valid user/session/resource context for security.
+- [ ] **Validation Context (SessionId / Resource binding)**  
+      Ensure all OTPs are scoped to a specific, valid user/session/resource context for security.
 
+---
 
 ## 📂 Project Structure
 
 ```text
 otp-access-demo/
-├── src/                      # Clean Architecture codebase
-│   ├── OtpAccess.Api/
-│   ├── OtpAccess.Application/
-│   ├── OtpAccess.Domain/
-│   └── OtpAccess.Infrastructure/
-├── bicep/                    # Azure Bicep IaC templates
+├── src/                        # Clean Architecture projects
+│   ├── OtpAccess.Functions.OtpApi/    # Azure Function API (.NET 8 isolated)
+│   ├── Application/                    # Application Layer (Business Logic)
+│   ├── Domain/                         # Domain Layer (Entities, Interfaces)
+│   └── Infrastructure/                 # Infrastructure Layer (EF Core, Repositories)
+├── infrastructure/              # Azure Bicep IaC templates
 │   ├── main.bicep
 │   ├── main.otp.bicep
-│   ├── env/                  # Environment parameter files
+│   ├── env/                      # Environment parameter files
 │   │   ├── dev/
-│   │   │   └── main.otp.dev.parameters.json
 │   │   ├── test/
-│   │   │   └── main.otp.test.parameters.json
 │   │   └── prod/
-│   │       └── main.otp.prod.parameters.json
-│   └── modules/              # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
+│   └── modules/                  # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
 ├── .github/
-│   └── workflows/            # GitHub Actions CI/CD pipeline files
+│   └── workflows/                # GitHub Actions CI/CD pipeline files
 │       └── deploy-otp.yml
-├── README.md                 # Project overview and instructions
+├── README.md                     # Project overview and instructions
