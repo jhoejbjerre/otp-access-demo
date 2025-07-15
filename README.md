@@ -35,7 +35,7 @@ The solution is designed as a Proof of Concept (PoC).
 - **Brute-force prevention planned via Azure-native or middleware-based solutions**  
   **TODO:** Evaluate rate-limiting options (Azure Front Door, API Management, CloudFlare, custom middleware).
 
-- **A few unit tests is applied for one of the func apps
+- **A few unit tests is applied for one of the func apps**
   **TODO:** More could be added in the future
 ---
 
