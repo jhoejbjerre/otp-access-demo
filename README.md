@@ -62,11 +62,11 @@ This project uses GitHub Actions for continuous integration and deployment (CI/C
 The pipeline deploys sequentially through environments (Dev → Test → Prod) with manual approval required for Test and Prod.
 
 ### Deployment Flow:
-
-```mermaid
-flowchart LR
-    A[deploy-dev ✅] --> B[deploy-test 🔶 (manual)]
-    B --> C[deploy-prod 🔶 (manual)]
+```markdown
++------------+     +-------------+     +-------------+
+| deploy-dev | --> | deploy-test | --> | deploy-prod |
++------------+     +-------------+     +-------------+
+     ✅              🔶 (manual)        🔶 (manual)
 
 ## 📝 Design Principles
 
