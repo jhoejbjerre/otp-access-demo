@@ -28,13 +28,11 @@ param userAssignedIdentityId string
 @description('Name of the subnet')
 param subnetResourceId string
 
-// Reference to existing Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2022-09-01' existing = {
   name: storageAccountName
   scope: resourceGroup(storageAccountResourceGroup)
 }
 
-// App Service Plan (Consumption)
 resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: hostingPlanName
   location: location
@@ -49,7 +47,6 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2024-04-01' = {
   }
 }
 
-// Function App with System-Assigned Managed Identity
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: name
   location: location

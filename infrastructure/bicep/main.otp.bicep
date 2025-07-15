@@ -16,7 +16,6 @@ param sqlAdminPassword string
 
 var storageAccountName = toLower('stotp${environment}${uniqueString(resourceGroup().id)}')
 
-// Modules
 module storage 'modules/storageAccount.bicep' = {
   name: 'deploy-storage'
   params: {
@@ -86,12 +85,25 @@ module network 'modules/network.bicep' = {
   }
 }
 
+module privateEndpoint 'modules/privateEndpoint.bicep' = {
+  name: 'deploy-pe'
+  params: {
+    name: 'pe-${environment}'
+    location: location
+    subnetId: network.outputs.privateEndpointSubnetId
+    privateLinkResourceId: sqlServer.outputs.sqlServerId
+    groupId: 'sqlServer'
+    subresourceName: 'sqlServer'
+  }  
+}
+
 module privateDnsZone 'modules/privateDnsZone.bicep' = {
   name: 'deploy-private-dns-zone'
   params: {
     location: 'global'
     environment: environment
     vnetResourceId: network.outputs.vnetId
+    privateEndpointIpAddress: privateEndpoint.outputs.privateEndpointIpAddress
   }
 }
 
@@ -119,18 +131,6 @@ module roleAssignment 'modules/roleAssignments.bicep' = {
     roles: roles
   }
   dependsOn: [keyVault]
-}
-
-module privateEndpoint 'modules/privateEndpoint.bicep' = {
-  name: 'deploy-pe'
-  params: {
-    name: 'pe-${environment}'
-    location: location
-    subnetId: network.outputs.privateEndpointSubnetId
-    privateLinkResourceId: sqlServer.outputs.sqlServerId
-    groupId: 'sqlServer'
-    subresourceName: 'sqlServer'
-  }  
 }
 
 output keyVaultName string = keyVault.outputs.keyVaultName
