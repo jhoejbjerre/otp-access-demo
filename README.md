@@ -45,6 +45,9 @@ This project implements a simple and secure one-time password (OTP) system using
 - **Azure Functions on Linux Consumption Plan (.NET 8 isolated worker model)**  
   Cost-effective, scalable, and aligned with modern .NET best practices.
 
+- **Application Insights integration for logging and monitoring**  
+  All OTP-related operations are logged via ILogger, with telemetry automatically routed to Azure Application Insights.
+
 - **CI/CD with GitHub Actions**  
   Multi-environment pipelines supporting validation, sequential deployments, and manual approvals.  
   **TODO:** Finalize production pipeline incl. manual approvals.
@@ -61,6 +64,7 @@ This project implements a simple and secure one-time password (OTP) system using
   - A User-Assigned Managed Identity (UAMI) is used by the Function App for runtime access to Azure resources (Key Vault, SQL).
 - Hosted as Azure Function App (.NET 8 isolated worker model) for scalability and low operational cost.
 - GitHub Actions handles CI/CD pipelines with environment-specific deployment.
+- Application Insights integration provides centralized telemetry for all environments.
 
 ---
 
@@ -79,9 +83,6 @@ This project implements a simple and secure one-time password (OTP) system using
 
 - [ ] **Rate Limiting & Brute Force Protection**  
       Consider Azure Front Door, API Management, or middleware-based solutions for throttling and IP-based rate limiting.
-
-- [ ] **Audit Logging (Long-Term Storage)**  
-      Store audit logs (requests, validations) in Azure Storage or Application Insights for long-term retention and analysis.
 
 - [ ] **Scheduled Cleanup of Expired OTPs**  
       Implement a timer-triggered Function to remove expired codes regularly.
@@ -115,4 +116,3 @@ otp-access-demo/
 │   └── workflows/                   # GitHub Actions CI/CD pipeline files
 │       └── deploy-otp.yml
 ├── README.md                        # Project overview and instructions
-
