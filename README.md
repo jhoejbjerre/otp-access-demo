@@ -98,20 +98,21 @@ This project implements a simple and secure one-time password (OTP) system using
 
 ```text
 otp-access-demo/
-├── src/                        # Clean Architecture projects
-│   ├── OtpAccess.Functions.OtpApi/    # Azure Function API (.NET 8 isolated)
-│   ├── Application/                    # Application Layer (Business Logic)
-│   ├── Domain/                         # Domain Layer (Entities, Interfaces)
-│   └── Infrastructure/                 # Infrastructure Layer (EF Core, Repositories)
-├── infrastructure/              # Azure Bicep IaC templates
+├── src/                             # Clean Architecture projects
+│   ├── OtpAccess.Functions.OtpApi/  # Azure Function API (.NET 8 isolated)
+│   ├── Application/                 # Application Layer (Business Logic)
+│   ├── Domain/                      # Domain Layer (Entities, Interfaces)
+│   └── Infrastructure/              # Infrastructure Layer (EF Core, Repositories)
+├── infrastructure/                  # Azure Bicep IaC templates
 │   ├── main.bicep
 │   ├── main.otp.bicep
-│   ├── env/                      # Environment parameter files
+│   ├── env/                         # Environment parameter files
 │   │   ├── dev/
 │   │   ├── test/
 │   │   └── prod/
-│   └── modules/                  # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
+│   └── modules/                     # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
 ├── .github/
-│   └── workflows/                # GitHub Actions CI/CD pipeline files
+│   └── workflows/                   # GitHub Actions CI/CD pipeline files
 │       └── deploy-otp.yml
-├── README.md                     # Project overview and instructions
+├── README.md                        # Project overview and instructions
+
