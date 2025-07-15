@@ -103,7 +103,7 @@ The pipeline deploys sequentially through environments (Dev → Test → Prod) w
       A timer-triggered Azure Function will be implemented to perform regular cleanup of expired OTP records from the database. This ensures that the dataset remains clean and only contains active, relevant entries.
 
 - [ ] **Offline / Resilient Design (Future)**  
-      Could be expanded with local caching or device-based OTPs for offline use scenarios.
+      Instead of device-based offline support, resilience can be achieved through Azure-native features such as SQL Geo-replication, zone-redundant storage and cross-region deployment.
 
 - [ ] **Validation Context (SessionId / Resource binding)**  
       Ensure all OTPs are scoped to a specific, valid user/session/resource context for security.
