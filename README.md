@@ -41,14 +41,33 @@ This project implements a simple and secure one-time password (OTP) system using
   Multi-environment pipelines supporting validation, sequential deployments, and manual approvals.  
   **TODO:** Review and finalize production pipeline incl. approvals.
 
+## 📝 Design Principles
+
+- Follows Clean Architecture principles to ensure separation of concerns, maintainability, and testability.
+- Uses Entity Framework Core for data access and Azure SQL Database for persistence.
+- Infrastructure is provisioned through Azure Bicep for consistent dev/test/prod environments.
+- Secrets management via Azure Key Vault.
+- Hosted as Azure Function App (.NET 8 isolated) for scalability and low operational cost.
+- GitHub Actions handles CI/CD pipelines with environment-specific deployment.
+
 ---
 
-## 📝 TODO / Backlog
+## 🚧 Known Gaps / TODOs / backlog
 
-- Implement context-aware OTP validation (SessionId, UserId)
-- Implement cleanup of expired OTPs (timer-triggered function or similar)
-- Implement rate limiting (middleware or Azure-native)
-- Finalize GitHub Actions pipelines for production
+- **Rate Limiting & Brute Force Protection**  
+  Consider using Azure Front Door, API Management, or a middleware-based solution for throttling and IP-based rate limiting.
+
+- **Audit Logging (Long-Term Storage)**  
+  Store audit logs (requests, validations) in Azure Storage or Application Insights for long-term retention and analysis.
+
+- **Scheduled Cleanup of Expired OTPs**  
+  Implement a timer-triggered Function to remove expired codes regularly.
+
+- **Offline / Resilient Design (Future)**  
+  Could be expanded with local caching / device-based OTPs for offline use scenarios.
+
+- **Validation Context (SessionId / Resource binding)**  
+  Ensure all OTPs are scoped to a specific, valid user/session/resource context for security.
 
 
 ## 📂 Project Structure
