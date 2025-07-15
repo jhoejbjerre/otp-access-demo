@@ -8,7 +8,7 @@ The solution is designed as a Proof of Concept (PoC).
 ## ✅ Features
 
 - **6-digit numeric OTP generation**  
-  User-friendly and easy to input manually. Ensures uniqueness per request.
+  Generates simple 6-digit numeric codes that are easy to communicate and transfer via e.g., SMS, email, or verbally. Ensures uniqueness per request.
 
 - **OTP validity of 10 minutes**  
   Enforces temporary and time-limited access for enhanced security.
