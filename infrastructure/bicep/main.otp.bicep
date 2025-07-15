@@ -16,7 +16,6 @@ param sqlAdminPassword string
 
 var storageAccountName = toLower('stotp${environment}${uniqueString(resourceGroup().id)}')
 
-// Modules
 module storage 'modules/storageAccount.bicep' = {
   name: 'deploy-storage'
   params: {
