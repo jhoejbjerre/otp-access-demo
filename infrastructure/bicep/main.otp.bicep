@@ -108,7 +108,7 @@ module privateEndpoint 'modules/privateEndpoint.bicep' = {
   }
 }
 
-module functionApp 'modules/functionApp.bicep' = {
+module generatefunctionApp 'modules/functionApp.bicep' = {
   name: 'deploy-funcapp-generate'
   params: {
     name: 'func-otp-generate-${environment}-${uniqueSuffix}'
@@ -157,6 +157,7 @@ module roleAssignment 'modules/roleAssignments.bicep' = {
 }
 
 output keyVaultName string = keyVault.outputs.keyVaultName
-output functionAppName string = functionApp.outputs.functionAppName
 output userAssignedIdentityPrincipalId string = managedIdentity.outputs.principalId
 output privateDnsZoneId string = privateDnsZone.outputs.privateDnsZoneId
+output generateFunctionAppName string = generatefunctionApp.outputs.functionAppName
+output validateFunctionAppName string = validateFunctionApp.outputs.functionAppName

@@ -50,34 +50,51 @@ jobs:
       - name: Set OtpDatabaseConnection in Azure App Settings
         if: success()
         run: |
-          funcAppName=$(az deployment group show \
-            --resource-group rg-otp-dev \
-            --name deploy-otp-dev \
-            --query "properties.outputs.functionAppName.value" \
-            --output tsv)
-          
-          if [ -z "$funcAppName" ]; then
-            echo "Could not resolve Function App name from deployment output"
-            exit 1
+          generateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-dev \
+              --name deploy-otp-dev \
+              --query "properties.outputs.generateFunctionAppName.value" \
+              --output tsv)
+
+          validateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-dev \
+              --name deploy-otp-dev \
+              --query "properties.outputs.validateFunctionAppName.value" \
+              --output tsv)
+
+          if [ -z "$generateFuncAppName" ] || [ -z "$validateFuncAppName" ]; then
+              echo "Could not resolve Function App names from deployment output"
+              exit 1
           fi
 
           az functionapp config appsettings set \
-            --name $funcAppName \
-            --resource-group rg-otp-dev \
-            --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_DEV }}"
+              --name $generateFuncAppName \
+              --resource-group rg-otp-dev \
+              --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_DEV }}"
+
+          az functionapp config appsettings set \
+              --name $validateFuncAppName \
+              --resource-group rg-otp-dev \
+              --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_DEV }}"
 
       - name: Set KeyVault Reference Identity on Function App
         if: success()
         run: |
-          funcAppName=$(az deployment group show \
-            --resource-group rg-otp-dev \
-            --name deploy-otp-dev \
-            --query "properties.outputs.functionAppName.value" \
-            --output tsv)
-          
-          if [ -z "$funcAppName" ]; then
-            echo "Could not resolve Function App name from deployment output"
-            exit 1
+          generateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-dev \
+              --name deploy-otp-dev \
+              --query "properties.outputs.generateFunctionAppName.value" \
+              --output tsv)
+
+          validateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-dev \
+              --name deploy-otp-dev \
+              --query "properties.outputs.validateFunctionAppName.value" \
+              --output tsv)
+
+          if [ -z "$generateFuncAppName" ] || [ -z "$validateFuncAppName" ]; then
+              echo "Could not resolve Function App names from deployment output"
+              exit 1
           fi          
 
           identityId=$(az identity show \
@@ -88,8 +105,13 @@ jobs:
 
           az functionapp update \
             --resource-group rg-otp-dev \
-            --name $funcAppName \
-            --set keyVaultReferenceIdentity=$identityId           
+            --name $generateFuncAppName \
+            --set keyVaultReferenceIdentity=$identityId
+
+          az functionapp update \
+            --resource-group rg-otp-dev \
+            --name $validateFuncAppName \
+            --set keyVaultReferenceIdentity=$identityId
           
       - name: Show deployment logs on failure
         if: failure()
@@ -136,35 +158,52 @@ jobs:
       - name: Set OtpDatabaseConnection in Azure App Settings
         if: success()
         run: |
-         funcAppName=$(az deployment group show \
-            --resource-group rg-otp-test \
-            --name deploy-otp-test \
-            --query "properties.outputs.functionAppName.value" \
-            --output tsv)
-            
-          if [ -z "$funcAppName" ]; then
-            echo "Could not resolve Function App name from deployment output"
-            exit 1
-          fi            
+          generateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-test \
+              --name deploy-otp-test \
+              --query "properties.outputs.generateFunctionAppName.value" \
+              --output tsv)
+
+          validateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-test \
+              --name deploy-otp-test \
+              --query "properties.outputs.validateFunctionAppName.value" \
+              --output tsv)
+
+          if [ -z "$generateFuncAppName" ] || [ -z "$validateFuncAppName" ]; then
+              echo "Could not resolve Function App names from deployment output"
+              exit 1
+          fi
 
           az functionapp config appsettings set \
-            --name $funcAppName \
-            --resource-group rg-otp-test \
-            --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_TEST }}"
+              --name $generateFuncAppName \
+              --resource-group rg-otp-test \
+              --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_TEST }}"
+
+          az functionapp config appsettings set \
+              --name $validateFuncAppName \
+              --resource-group rg-otp-test \
+              --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_TEST }}"
 
       - name: Set KeyVault Reference Identity on Function App
         if: success()
         run: |
-          funcAppName=$(az deployment group show \
-            --resource-group rg-otp-test \
-            --name deploy-otp-test \
-            --query "properties.outputs.functionAppName.value" \
-            --output tsv)
-            
-          if [ -z "$funcAppName" ]; then
-            echo "Could not resolve Function App name from deployment output"
-            exit 1
-          fi            
+          generateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-test \
+              --name deploy-otp-test \
+              --query "properties.outputs.generateFunctionAppName.value" \
+              --output tsv)
+
+          validateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-test \
+              --name deploy-otp-test \
+              --query "properties.outputs.validateFunctionAppName.value" \
+              --output tsv)
+
+          if [ -z "$generateFuncAppName" ] || [ -z "$validateFuncAppName" ]; then
+              echo "Could not resolve Function App names from deployment output"
+              exit 1
+          fi
 
           identityId=$(az identity show \
             --resource-group rg-otp-test \
@@ -174,9 +213,13 @@ jobs:
 
           az functionapp update \
             --resource-group rg-otp-test \
-            --name $funcAppName \
+            --name $generateFuncAppName \
             --set keyVaultReferenceIdentity=$identityId
 
+          az functionapp update \
+            --resource-group rg-otp-test \
+            --name $validateFuncAppName \
+            --set keyVaultReferenceIdentity=$identityId
           
       - name: Show deployment logs on failure
         if: failure()
@@ -222,35 +265,52 @@ jobs:
       - name: Set OtpDatabaseConnection in Azure App Settings
         if: success()
         run: |
-          funcAppName=$(az deployment group show \
-            --resource-group rg-otp-prod \
-            --name deploy-otp-prod \
-            --query "properties.outputs.functionAppName.value" \
-            --output tsv)
-            
-          if [ -z "$funcAppName" ]; then
-            echo "Could not resolve Function App name from deployment output"
-            exit 1
-          fi            
+          generateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-prod \
+              --name deploy-otp-prod \
+              --query "properties.outputs.generateFunctionAppName.value" \
+              --output tsv)
+
+          validateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-prod \
+              --name deploy-otp-prod \
+              --query "properties.outputs.validateFunctionAppName.value" \
+              --output tsv)
+
+          if [ -z "$generateFuncAppName" ] || [ -z "$validateFuncAppName" ]; then
+              echo "Could not resolve Function App names from deployment output"
+              exit 1
+          fi
 
           az functionapp config appsettings set \
-            --name $funcAppName \
-            --resource-group rg-otp-prod \
-            --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_PROD }}"
+              --name $generateFuncAppName \
+              --resource-group rg-otp-prod \
+              --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_PROD }}"
+
+          az functionapp config appsettings set \
+              --name $validateFuncAppName \
+              --resource-group rg-otp-prod \
+              --settings OtpDatabaseConnection="${{ secrets.SQL_CONNECTION_STRING_PROD }}"
 
       - name: Set KeyVault Reference Identity on Function App
         if: success()
         run: |
-          funcAppName=$(az deployment group show \
-            --resource-group rg-otp-prod \
-            --name deploy-otp-prod \
-            --query "properties.outputs.functionAppName.value" \
-            --output tsv)
-            
-          if [ -z "$funcAppName" ]; then
-            echo "Could not resolve Function App name from deployment output"
-            exit 1
-          fi            
+          generateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-prod \
+              --name deploy-otp-prod \
+              --query "properties.outputs.generateFunctionAppName.value" \
+              --output tsv)
+
+          validateFuncAppName=$(az deployment group show \
+              --resource-group rg-otp-prod \
+              --name deploy-otp-prod \
+              --query "properties.outputs.validateFunctionAppName.value" \
+              --output tsv)
+
+          if [ -z "$generateFuncAppName" ] || [ -z "$validateFuncAppName" ]; then
+              echo "Could not resolve Function App names from deployment output"
+              exit 1
+          fi
 
           identityId=$(az identity show \
             --resource-group rg-otp-prod \
@@ -260,8 +320,13 @@ jobs:
 
           az functionapp update \
             --resource-group rg-otp-prod \
-            --name $funcAppName \
-            --set keyVaultReferenceIdentity=$identityId           
+            --name $generateFuncAppName \
+            --set keyVaultReferenceIdentity=$identityId
+
+          az functionapp update \
+            --resource-group rg-otp-prod \
+            --name $validateFuncAppName \
+            --set keyVaultReferenceIdentity=$identityId
 
       - name: Show deployment logs on failure
         if: failure()
