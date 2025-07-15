@@ -37,8 +37,10 @@ The solution is designed as a Proof of Concept (PoC).
   Ensures separation between Domain, Application, Infrastructure, and API layers.
 
 - **Brute-force prevention planned via Azure-native or middleware-based solutions**  
-  **TODO:** Evaluate rate-limiting options (Azure Front Door, API Management, custom middleware).
+  **TODO:** Evaluate rate-limiting options (Azure Front Door, API Management, CloudFlare, custom middleware).
 
+-**A few unit tests is applied for one of the func apps
+**TODO:** More could be added in the future
 ---
 
 ## ✅ Infrastructure & Deployment
