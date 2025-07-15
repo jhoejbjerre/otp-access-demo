@@ -37,6 +37,21 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
         }
       }
     ]
+    privateDnsZoneGroups: [
+      {
+        name: 'default'
+        properties: {
+          privateDnsZoneConfigs: [
+            {
+              name: 'privatelink.database.windows.net'
+              properties: {
+                privateDnsZoneId: privateDnsZoneId
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }
 
