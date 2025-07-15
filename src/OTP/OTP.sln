@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtpAccess.Functions.OtpApi"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtpValidate.Functions.OtpApi", "OtpValidate.Functions.OtpApi\OtpValidate.Functions.OtpApi.csproj", "{BB234299-64EE-45D7-941D-C7421F2E453C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtpAccess.Functions.OtpApi.Tests", "..\..\tests\OtpAccess.Functions.OtpApi.Tests\OtpAccess.Functions.OtpApi.Tests.csproj", "{33879149-08FC-4868-947C-59670C8A0C4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{BB234299-64EE-45D7-941D-C7421F2E453C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB234299-64EE-45D7-941D-C7421F2E453C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB234299-64EE-45D7-941D-C7421F2E453C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33879149-08FC-4868-947C-59670C8A0C4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33879149-08FC-4868-947C-59670C8A0C4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33879149-08FC-4868-947C-59670C8A0C4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33879149-08FC-4868-947C-59670C8A0C4A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,5 +54,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{EEC6B2D3-3761-4371-B424-4293B638B3AA} = {686433BF-B9F8-418D-B936-52EA58A8B843}
 		{BB234299-64EE-45D7-941D-C7421F2E453C} = {686433BF-B9F8-418D-B936-52EA58A8B843}
+		{33879149-08FC-4868-947C-59670C8A0C4A} = {686433BF-B9F8-418D-B936-52EA58A8B843}
 	EndGlobalSection
 EndGlobal
