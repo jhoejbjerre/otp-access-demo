@@ -1,6 +1,6 @@
 ﻿namespace Application.Options;
 
-public class OtpOptions
+public sealed class OtpOptions
 {
-    public string OtpSecretKey { get; set; } = string.Empty;
+    public string OtpSecretKey { get; init; } = string.Empty;
 }

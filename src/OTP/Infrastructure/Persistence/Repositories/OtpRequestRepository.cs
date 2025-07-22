@@ -17,7 +17,7 @@ namespace Infrastructure.Persistence.Repositories;
 ///     It is included solely to demonstrate that database-related operations are observable through logging,
 ///     such as viewing activity in Application Insights during development and testing.
 /// </remarks>
-public class OtpRequestRepository : IOtpRequestRepository
+public sealed class OtpRequestRepository : IOtpRequestRepository
 {
     private readonly OtpDbContext _dbContext;
     private readonly ILogger<OtpRequestRepository> _logger;

@@ -10,7 +10,8 @@ namespace OtpAccess.Functions.OtpApi.Tests.Helpers;
 ///     without relying on the real Azure Functions runtime.
 ///     This implementation provides only the minimal members required for testing and leaves other members null.
 /// </summary>
-public class FakeFunctionContext : FunctionContext
+
+public sealed class FakeFunctionContext : FunctionContext
 {
     public override string InvocationId => Guid.NewGuid().ToString();
     public override string FunctionId => Guid.NewGuid().ToString();

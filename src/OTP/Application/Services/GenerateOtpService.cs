@@ -11,16 +11,9 @@ namespace Application.Services;
 /// <summary>
 ///     Application service responsible for generating and storing one-time passwords (OTPs).
 /// </summary>
-public class GenerateOtpService : IGenerateOtpService
+public sealed class GenerateOtpService(IOptions<OtpOptions> options, IOtpRequestRepository repository) : IGenerateOtpService
 {
-    private readonly IOtpRequestRepository _repository;
-    private readonly OtpOptions _options;
-
-    public GenerateOtpService(IOptions<OtpOptions> options, IOtpRequestRepository repository)
-    {
-        _options = options.Value;
-        _repository = repository;
-    }
+    private readonly OtpOptions _options = options.Value;
 
     /// <inheritdoc />
     public async Task<string> GenerateOtpAsync(GenerateOtpCommand command, CancellationToken cancellationToken)
@@ -40,8 +33,8 @@ public class GenerateOtpService : IGenerateOtpService
             Created = DateTimeOffset.UtcNow
         };
 
-        await _repository.AddAsync(otpRequest, cancellationToken);
-        await _repository.SaveChangesAsync(cancellationToken);
+        await repository.AddAsync(otpRequest, cancellationToken);
+        await repository.SaveChangesAsync(cancellationToken);
 
         return otp;
     }

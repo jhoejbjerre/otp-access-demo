@@ -12,7 +12,7 @@ namespace OtpAccess.Functions.OtpApi.Tests.Helpers;
 ///     Other HTTP-related properties such as headers, cookies, method, and URL are initialized with safe defaults suitable
 ///     for testing.
 /// </summary>
-public class FakeHttpRequestData : HttpRequestData
+public sealed class FakeHttpRequestData : HttpRequestData
 {
     private readonly MemoryStream _bodyStream;
 

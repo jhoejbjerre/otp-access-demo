@@ -11,7 +11,7 @@ namespace OtpAccess.Functions.OtpApi.Tests;
 /// <summary>
 ///     Unit tests for <see cref="GenerateOtpService" />.
 /// </summary>
-public class GenerateOtpServiceTests
+public sealed class GenerateOtpServiceTests
 {
     private readonly Mock<IOtpRequestRepository> _repositoryMock;
     private readonly GenerateOtpService _service;
