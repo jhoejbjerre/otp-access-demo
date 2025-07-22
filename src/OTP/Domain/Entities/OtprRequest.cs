@@ -2,11 +2,11 @@
 
 namespace Domain.Entities;
 
-public class OtpRequest : BaseAuditableEntity
+public sealed class OtpRequest : BaseAuditableEntity
 {
-    public string Email { get; set; } = default!;
-    public string? Phone { get; set; }
-    public string OtpCode { get; set; } = default!;
-    public DateTime ExpiresAt { get; set; }
+    public string Email { get; init; } = default!;
+    public string? Phone { get; init; }
+    public string OtpCode { get; init; } = default!;
+    public DateTime ExpiresAt { get; init; }
     public bool IsUsed { get; set; }
 }

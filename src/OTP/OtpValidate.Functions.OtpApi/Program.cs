@@ -4,7 +4,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OtpAccess.Functions.OtpApi.Extensions;
+using OtpValidate.Functions.OtpApi.Extensions;
 
 var host = new HostBuilder()
            .ConfigureFunctionsWebApplication()

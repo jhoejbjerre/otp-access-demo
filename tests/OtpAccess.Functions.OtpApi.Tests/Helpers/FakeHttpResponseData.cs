@@ -10,11 +10,9 @@ namespace OtpAccess.Functions.OtpApi.Tests.Helpers;
 ///     Default values are provided for headers, status code, and cookies to simplify test setup.
 ///     Use <see cref="GetBodyAsString" /> to retrieve the written response body as a string for assertions in tests.
 /// </summary>
-public class FakeHttpResponseData : HttpResponseData
+public sealed class FakeHttpResponseData(HttpRequestData request) : HttpResponseData(request.FunctionContext)
 {
     private MemoryStream _bodyStream = new();
-
-    public FakeHttpResponseData(HttpRequestData request) : base(request.FunctionContext) => StatusCode = HttpStatusCode.OK;
 
     public override Stream Body
     {
@@ -24,7 +22,7 @@ public class FakeHttpResponseData : HttpResponseData
 
     public override HttpHeadersCollection Headers { get; set; } = new();
 
-    public override HttpStatusCode StatusCode { get; set; }
+    public override HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
 
     public override HttpCookies Cookies => null;
 

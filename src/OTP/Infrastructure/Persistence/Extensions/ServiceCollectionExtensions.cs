@@ -22,7 +22,8 @@ public static class ServiceCollectionExtensions
                 options.UseAzureSql(otpDatabaseConnection)
                        .EnableSensitiveDataLogging()
                        .UseLoggerFactory(loggerFactory)
-                       .LogTo(Console.WriteLine, LogLevel.Information);
+                       .LogTo(Console.WriteLine, LogLevel.Information)
+                       .EnableDetailedErrors();
             });
 
         services.AddScoped<IOtpRequestRepository, OtpRequestRepository>();

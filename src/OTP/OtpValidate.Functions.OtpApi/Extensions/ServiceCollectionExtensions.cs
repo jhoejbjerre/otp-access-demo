@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OtpValidate.Functions.OtpApi.Services;
 
-namespace OtpAccess.Functions.OtpApi.Extensions;
+namespace OtpValidate.Functions.OtpApi.Extensions;
 
 public static class ServiceCollectionExtensions
 {

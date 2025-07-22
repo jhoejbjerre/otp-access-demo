@@ -3,4 +3,4 @@
 /// <summary>
 ///     Command representing the input required to validate an OTP.
 /// </summary>
-public record ValidateOtpCommand(string Email, string OtpCode);
+public sealed record ValidateOtpCommand(string Email, string OtpCode);

@@ -3,13 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Context;
 
-public class OtpDbContext : DbContext
+public class OtpDbContext(DbContextOptions<OtpDbContext> options) : DbContext(options)
 {
-    public OtpDbContext(DbContextOptions<OtpDbContext> options) : base(options)
-    {
-    }
-
-    public DbSet<OtpRequest> OtpRequests => Set<OtpRequest>();
+      public DbSet<OtpRequest> OtpRequests => Set<OtpRequest>();
 
     protected override void OnModelCreating(ModelBuilder builder) => ConfigureOtpRequestEntity(builder);
 
