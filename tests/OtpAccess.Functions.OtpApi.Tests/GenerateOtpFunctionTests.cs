@@ -10,6 +10,7 @@ using OtpAccess.Functions.OtpApi.Tests.Helpers;
 
 namespace OtpAccess.Functions.OtpApi.Tests;
 
+
 public sealed class GenerateOtpFunctionTests
 {
     private readonly Mock<IGenerateOtpService> _otpServiceMock = new();
