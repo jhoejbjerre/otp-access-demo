@@ -44,8 +44,9 @@ The solution is designed as a Proof of Concept (PoC).
 - **Infrastructure as Code (IaC) with Azure Bicep**  
   Automates deployment of resources including Function App, Key Vault, SQL, Storage, Networking, and RBAC.
 
-- **Azure Functions on Linux Consumption Plan (.NET 8 isolated worker model)**  
+- **Azure Functions on Linux Elastic Premium plan (.NET 8 isolated worker model)**  
   Cost-effective, scalable, and aligned with modern .NET best practices.
+  Moved from Consumption to Elastic Premium plan to avoid using firewall openings and go with subnet access to the DB
   **TODO:** Improve HTTP response standards for OTP validation  
 - Return `200 OK` only on successful validation.  
 - Return `400 Bad Request` for invalid input (missing email or OTP).  
