@@ -1,6 +1,3 @@
-```markdown
-![CI/CD](https://github.com/jhoejbjerre/otp-access-demo/actions/workflows/deploy-otp.yml/badge.svg)
-
 # OTP Access Demo
 
 This project implements a simple and secure one-time password (OTP) system using Clean Architecture and .NET 8.
@@ -11,7 +8,7 @@ The solution is designed as a Proof of Concept (PoC).
 ## ✅ Features
 
 - **6-digit numeric OTP generation**  
-  User-friendly and easy to input manually. Ensures uniqueness per request.
+  Generates simple 6-digit numeric codes that are easy to communicate and transfer via e.g., SMS, email, or verbally. Ensures uniqueness per request.
 
 - **OTP validity of 10 minutes**  
   Enforces temporary and time-limited access for enhanced security.
@@ -19,10 +16,9 @@ The solution is designed as a Proof of Concept (PoC).
 - **One-time use enforcement**  
   Guarantees that OTPs cannot be reused.
 
-- **Tied to a user or resource-specific context (e.g., SessionId or Email)**  
-  OTPs are scoped to a specific context to prevent misuse.  
-  **TODO:** Ensure validation is fully context-aware if not already in place.
-
+- **Tied to a user or resource-specific context (Email and OptCode)**  
+  OTPs are scoped to a specific context for security to prevent misuse. So they can be validated as valid and then used once and then they will be marked as IsUsed
+  
 - **Validation via Entity Framework Core with Azure SQL Database**  
   Secure and reliable persistence of OTP data.
 
@@ -37,8 +33,10 @@ The solution is designed as a Proof of Concept (PoC).
   Ensures separation between Domain, Application, Infrastructure, and API layers.
 
 - **Brute-force prevention planned via Azure-native or middleware-based solutions**  
-  **TODO:** Evaluate rate-limiting options (Azure Front Door, API Management, custom middleware).
+  **TODO:** Evaluate rate-limiting options (Azure Front Door, API Management, CloudFlare, custom middleware).
 
+- **A few unit tests is applied for one of the func apps**
+  **TODO:** More could be added in the future
 ---
 
 ## ✅ Infrastructure & Deployment
@@ -48,6 +46,12 @@ The solution is designed as a Proof of Concept (PoC).
 
 - **Azure Functions on Linux Consumption Plan (.NET 8 isolated worker model)**  
   Cost-effective, scalable, and aligned with modern .NET best practices.
+  **TODO:** Improve HTTP response standards for OTP validation  
+- Return `200 OK` only on successful validation.  
+- Return `400 Bad Request` for invalid input (missing email or OTP).  
+- Return `404 Not Found` when OTP is not found or expired.  
+- Return `409 Conflict` if OTP has already been used.  
+- Return `500 Internal Server Error` on unhandled exceptions.
 
 - **Application Insights integration for logging and monitoring**  
   All OTP-related operations are logged via ILogger, with telemetry automatically routed to Azure Application Insights.
@@ -62,14 +66,16 @@ The solution is designed as a Proof of Concept (PoC).
 
 This project uses GitHub Actions for continuous integration and deployment (CI/CD).  
 The pipeline deploys sequentially through environments (Dev → Test → Prod) with manual approval required for Test and Prod.
+This is deployed under one subscription for the POC in separate resource groups for each environment
 
 ### Deployment Flow:
-
+```markdown
 +------------+     +-------------+     +-------------+
-|  deploy-dev| --> |  deploy-test| --> |  deploy-prod |
+| deploy-dev | --> | deploy-test | --> | deploy-prod |
 +------------+     +-------------+     +-------------+
-       ✅               🔶 (manual)         🔶 (manual)
+     ✅              🔶 (manual)        🔶 (manual)
 
+**TODO:** Finalize test and prod
 
 ## 📝 Design Principles
 
@@ -102,34 +108,37 @@ The pipeline deploys sequentially through environments (Dev → Test → Prod) w
       Consider Azure Front Door, API Management, or middleware-based solutions for throttling and IP-based rate limiting.
 
 - [ ] **Scheduled Cleanup of Expired OTPs**  
-      Implement a timer-triggered Function to remove expired codes regularly.
+      A timer-triggered Azure Function will be implemented to perform regular cleanup of expired OTP records from the database. This ensures that the dataset remains clean and only contains active, relevant entries.
 
 - [ ] **Offline / Resilient Design (Future)**  
-      Could be expanded with local caching or device-based OTPs for offline use scenarios.
-
-- [ ] **Validation Context (SessionId / Resource binding)**  
-      Ensure all OTPs are scoped to a specific, valid user/session/resource context for security.
-
+      Instead of device-based offline support, resilience can be achieved through Azure-native features
+      such as SQL Geo-replication, zone-redundant storage and cross-region deployment.
 ---
 
 ## 📂 Project Structure
 
 ```text
 otp-access-demo/
-├── src/                             # Clean Architecture projects
-│   ├── OtpAccess.Functions.OtpApi/  # Azure Function API (.NET 8 isolated)
-│   ├── Application/                 # Application Layer (Business Logic)
-│   ├── Domain/                      # Domain Layer (Entities, Interfaces)
-│   └── Infrastructure/              # Infrastructure Layer (EF Core, Repositories)
-├── infrastructure/                  # Azure Bicep IaC templates
+├── src/                                  # Clean Architecture projects
+│   ├── OtpAccess.Functions.OtpApi/       # Azure Function API for OTP generation (.NET 8 isolated)
+│   ├── OtpValidate.Functions.OtpApi/     # Azure Function API for OTP validation (.NET 8 isolated)
+│   ├── OtpAccess.Functions.OtpApi.Tests/ # Unit tests for OtpAccess.Functions.OtpApi
+│   ├── Application/                      # Application Layer (Business Logic)
+│   ├── Domain/                           # Domain Layer (Entities, Interfaces)
+│   │   ├── Common/                       # Shared base entities (e.g., BaseEntity)
+│   │   ├── Entities/                     # Domain entities (e.g., OtpRequest)
+│   │   └── Interfaces/                   # Domain interfaces (e.g., repository contracts)
+│   └── Infrastructure/                   # Infrastructure Layer (EF Core, Repositories)
+├── infrastructure/                       # Azure Bicep IaC templates
 │   ├── main.bicep
 │   ├── main.otp.bicep
-│   ├── env/                         # Environment parameter files
+│   ├── env/                              # Environment parameter files
 │   │   ├── dev/
 │   │   ├── test/
 │   │   └── prod/
-│   └── modules/                     # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
+│   └── modules/                          # Reusable Bicep modules (FunctionApp, KeyVault, etc.)
 ├── .github/
-│   └── workflows/                   # GitHub Actions CI/CD pipeline files
+│   └── workflows/                        # GitHub Actions CI/CD pipeline files
 │       └── deploy-otp.yml
-├── README.md                        # Project overview and instructions
+├── README.md                             # Project overview and instructions
+
