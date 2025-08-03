@@ -20,7 +20,7 @@ public sealed class FakeHttpResponseData(HttpRequestData request) : HttpResponse
         set => _bodyStream = (MemoryStream) value;
     }
 
-    public override HttpHeadersCollection Headers { get; set; } = new();
+    public override HttpHeadersCollection Headers { get; set; } = [];
 
     public override HttpStatusCode StatusCode { get; set; } = HttpStatusCode.OK;
 
