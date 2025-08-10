@@ -1,9 +1,11 @@
-﻿using Application.Commands;
+using Application.Commands;
 using Application.Interfaces;
 using Application.Options;
 using Application.Utilities;
+
 using Domain.Entities;
 using Domain.Interfaces;
+
 using Microsoft.Extensions.Options;
 
 namespace Application.Services;
@@ -18,14 +20,14 @@ public sealed class GenerateOtpService(IOptions<OtpOptions> options, IOtpRequest
     /// <inheritdoc />
     public async Task<string> GenerateOtpAsync(GenerateOtpCommand command, CancellationToken cancellationToken)
     {
-        var otp = Random.Shared.Next(100000, 999999).ToString();
-        var salt = _options.OtpSecretKey;
-        var hashedOtp = OtpHasher.HashOtpWithSalt(otp, salt);
+        string otp = Random.Shared.Next(100000, 999999).ToString();
+        string salt = _options.OtpSecretKey;
+        string hashedOtp = OtpHasher.HashOtpWithSalt(otp, salt);
 
         // TODO: test my code review is working as expected adding a code smell
 
         // Magic number usage instead of constant
-        var expirationMinutes = 7; // should be a named constant or config value
+        int expirationMinutes = 7; // should be a named constant or config value
 
         // Console.WriteLine instead of logging framework
         Console.WriteLine($"Generated OTP for {command.Email} with expiration {expirationMinutes} minutes");

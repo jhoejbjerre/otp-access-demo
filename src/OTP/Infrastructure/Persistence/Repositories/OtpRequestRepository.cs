@@ -1,6 +1,8 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Interfaces;
+
 using Infrastructure.Persistence.Context;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +33,7 @@ public sealed class OtpRequestRepository(
     /// <inheritdoc />
     public async Task AddAsync(OtpRequest entity, CancellationToken cancellationToken = default)
     {
-        await _dbContext.OtpRequests.AddAsync(entity, cancellationToken);
+        _ = await _dbContext.OtpRequests.AddAsync(entity, cancellationToken);
         _logger.LogInformation("Added new OTP request with Id '{Id}' for email '{Email}'.", entity.Id, entity.Email);
     }
 
@@ -39,7 +41,7 @@ public sealed class OtpRequestRepository(
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Saving changes to database...");
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        _ = await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogDebug("Changes saved successfully.");
     }
 
@@ -48,7 +50,7 @@ public sealed class OtpRequestRepository(
     {
         _logger.LogDebug("Attempting to mark OTP as used for email '{Email}'.", email);
 
-        var otpRequest = await _dbContext.OtpRequests
+        OtpRequest? otpRequest = await _dbContext.OtpRequests
                                          .FirstOrDefaultAsync(
                                              x => x.Email == email && x.OtpCode == hashedOtp && !x.IsUsed && x.ExpiresAt > DateTime.UtcNow,
                                              cancellationToken);

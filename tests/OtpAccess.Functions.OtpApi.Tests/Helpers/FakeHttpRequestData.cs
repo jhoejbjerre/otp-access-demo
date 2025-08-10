@@ -1,5 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Text;
+
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -12,7 +13,7 @@ namespace OtpAccess.Functions.OtpApi.Tests.Helpers;
 ///     Other HTTP-related properties such as headers, cookies, method, and URL are initialized with safe defaults suitable
 ///     for testing.
 /// </summary>
-public sealed class FakeHttpRequestData(FunctionContext functionContext, string body) : HttpRequestData(functionContext)
+public sealed class FakeHttpRequestData(FunctionContext functionContext, string body) : HttpRequestData(functionContext), IDisposable
 {
     private readonly MemoryStream _bodyStream = new(Encoding.UTF8.GetBytes(body));
 
@@ -29,4 +30,9 @@ public sealed class FakeHttpRequestData(FunctionContext functionContext, string 
     public override string Method => "POST";
 
     public override HttpResponseData CreateResponse() => new FakeHttpResponseData(this);
+
+    public void Dispose()
+    {
+        throw new NotImplementedException();
+    }
 }

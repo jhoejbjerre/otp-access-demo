@@ -1,4 +1,4 @@
-﻿using Application.Commands;
+using Application.Commands;
 
 namespace Application.Common.Interfaces;
 

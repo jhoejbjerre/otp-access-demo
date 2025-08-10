@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+using Domain.Entities;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Context;
@@ -11,35 +12,35 @@ public class OtpDbContext(DbContextOptions<OtpDbContext> options) : DbContext(op
 
     private static void ConfigureOtpRequestEntity(ModelBuilder modelBuilder)
     {
-        var entity = modelBuilder.Entity<OtpRequest>();
+        Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<OtpRequest> entity = modelBuilder.Entity<OtpRequest>();
 
-        entity.ToTable("OtpRequest", "dto");
+        _ = entity.ToTable("OtpRequest", "dto");
 
-        entity.HasKey(e => e.Id);
+        _ = entity.HasKey(e => e.Id);
 
-        entity.Property(e => e.Email)
+        _ = entity.Property(e => e.Email)
               .IsRequired()
               .HasMaxLength(200);
 
-        entity.Property(e => e.Phone)
+        _ = entity.Property(e => e.Phone)
               .HasMaxLength(20);
 
-        entity.Property(e => e.OtpCode)
+        _ = entity.Property(e => e.OtpCode)
               .IsRequired()
               .HasMaxLength(64);
 
-        entity.Property(e => e.ExpiresAt)
+        _ = entity.Property(e => e.ExpiresAt)
               .IsRequired();
 
-        entity.Property(e => e.IsUsed)
+        _ = entity.Property(e => e.IsUsed)
               .IsRequired()
               .HasDefaultValue(false);
 
-        entity.Property(e => e.Created)
+        _ = entity.Property(e => e.Created)
               .IsRequired()
               .HasDefaultValueSql("SYSDATETIMEOFFSET()");
 
-        entity.Property(e => e.LastModified)
+        _ = entity.Property(e => e.LastModified)
               .HasDefaultValueSql("SYSDATETIMEOFFSET()");
     }
 }

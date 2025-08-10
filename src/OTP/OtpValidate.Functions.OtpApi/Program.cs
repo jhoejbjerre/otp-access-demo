@@ -1,35 +1,38 @@
-﻿using System.Linq;
+using System.Linq;
+
 using Infrastructure.Persistence.Extensions;
+
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+
 using OtpValidate.Functions.OtpApi.Extensions;
 
-var host = new HostBuilder()
+IHost host = new HostBuilder()
            .ConfigureFunctionsWebApplication()
            .ConfigureServices(
                (context, services) =>
                {
-                   var configuration = context.Configuration;
+                   Microsoft.Extensions.Configuration.IConfiguration configuration = context.Configuration;
 
-                   services.AddApplicationInsightsTelemetryWorkerService();
-                   services.ConfigureFunctionsApplicationInsights();
+                   _ = services.AddApplicationInsightsTelemetryWorkerService();
+                   _ = services.ConfigureFunctionsApplicationInsights();
 
-                   services.Configure<LoggerFilterOptions>(
+                   _ = services.Configure<LoggerFilterOptions>(
                        options =>
                        {
-                           var toRemove = options.Rules
+                           LoggerFilterRule toRemove = options.Rules
                                                  .FirstOrDefault(rule => rule.ProviderName == "Microsoft.Extensions.Logging.ApplicationInsights.ApplicationInsightsLoggerProvider");
 
                            if (toRemove is not null)
                            {
-                               options.Rules.Remove(toRemove);
+                               _ = options.Rules.Remove(toRemove);
                            }
                        });
 
-                   services.AddInfrastructureServices(configuration);
-                   services.AddForValidateOtp(configuration);
+                   _ = services.AddInfrastructureServices(configuration);
+                   _ = services.AddForValidateOtp(configuration);
                })
            .Build();
 

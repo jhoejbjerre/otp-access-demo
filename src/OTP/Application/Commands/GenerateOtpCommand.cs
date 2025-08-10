@@ -1,4 +1,4 @@
-﻿namespace Application.Commands;
+namespace Application.Commands;
 
 /// <summary>
 ///     Command representing the input required to request an OTP.
