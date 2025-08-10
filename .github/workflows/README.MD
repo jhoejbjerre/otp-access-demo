@@ -42,51 +42,7 @@ flowchart TD
     AF_bicep --> AF_commit
     AF_detect -->|No relevant changes| AF_skip[Skip autofix]
   end
-
-  %% Workflow-run trigger
-  AF_commit -->|workflow_run: completed| CR[Automated Code Review workflow]
-  AF_skip -->|still completes| CR
-
-  %% Code Review
-  subgraph G2["Automated Code Review code-review.yml"]
-    direction LR
-    CR --> CR_init[init
-    find PR for SHA + resolve current head SHA]
-    CR_init --> CR_detect[detect-changes
-    paths-filter]
-    CR_detect -->|C# changed| CR_cs[lint-csharp:
-    restore, build, NEWLINE verify formatting]
-    CR_detect -->|Bicep changed| CR_bicep[lint-bicep:
-    bicep build + lint]
-    CR_detect -->|JS/TS changed| CR_fe[lint-frontend:
-    npm ci + npm run lint]
-    CR_detect -->|No relevant changes| CR_no[Skip linters]
-
-    %% Sonar conditional
-    CR_cs -.-> CR_sonar
-    CR_bicep -.-> CR_sonar
-    CR_fe -.-> CR_sonar
-    CR_sonar{All executed linters
-    succeeded?}
-    CR_sonar -->|Yes| CR_scan[sonar-review:
-    containerized SonarQube]
-    CR_sonar -->|No| CR_skip_sonar[Skip Sonar
-    fail fast]
-
-    %% Finalize and checks
-    CR_scan --> CR_finalize[finalize:
-    umbrella conclusion]
-    CR_skip_sonar --> CR_finalize
-    CR_finalize --> CR_checks[report-checks:
-    publish per-stage PR checks]
-  end
-
-  %% Output to PR
-  CR_checks --> PR[PR status checks:
-  lint-csharp / lint-bicep / lint-frontend / sonar-review
-  + umbrella Automated Code Review]
-
----
+  ---
 
 ## 1) Auto Fix Style (`auto-fix.yml`)
 
