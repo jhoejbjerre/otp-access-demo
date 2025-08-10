@@ -1,0 +1,59 @@
+name: Auto Fix Style
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, develop]
+
+permissions:
+  contents: write    # needed for auto-commit
+  pull-requests: write
+
+concurrency:
+  group: autofix-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  autofix:
+    if: ${{ github.event.pull_request.head.repo.fork == false && !contains(github.event.pull_request.title, '[autofix]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      # C# auto-format + analyzers
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: dotnet format (respect .editorconfig)
+        run: |
+          dotnet format --folder --severity info
+          dotnet format analyzers --folder --severity info
+
+      # Bicep auto-format
+      - name: Install Azure CLI + Bicep
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          az bicep install
+      - name: bicep format
+        run: |
+          shopt -s nullglob
+          for f in infrastructure/bicep/**/*.bicep infrastructure/bicep/*.bicep; do
+            echo "Formatting $f"
+            bicep format "$f"
+          done
+          shopt -u nullglob
+
+      # JS/TS auto-fix
+      - name: ESLint --fix (optional)
+        if: hashFiles('**/package.json') != ''
+        run: |
+          npm ci || true
+          npx eslint . --ext .js,.ts,.tsx --fix || true
+
+      # Commit changes if any
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: apply auto-format [autofix]"
+          branch: ${{ github.head_ref }}
