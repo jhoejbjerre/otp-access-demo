@@ -42,7 +42,8 @@ flowchart TD
     AF_bicep --> AF_commit
     AF_detect -->|No relevant changes| AF_skip[Skip autofix]
   end
-  ---
+
+---
 
 ## 1) Auto Fix Style (`auto-fix.yml`)
 
