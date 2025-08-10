@@ -22,6 +22,18 @@ Three workflows handle the full lifecycle:
 | `code-review.yml` | Runs language linters and SonarQube review **after** Auto Fix finished. Publishes per-stage PR checks. | `workflow_run` of **Auto Fix Style** (on `completed`) |
 | `deploy-otp.yml` | Deploys OTP infrastructure (dev/test/prod) with gated approvals. | `push` to `main` |
 
+```mermaid
+sequenceDiagram
+    participant dotcom
+    participant iframe
+    participant viewscreen
+    dotcom->>iframe: loads html w/ iframe url
+    iframe->>viewscreen: request template
+    viewscreen->>iframe: html & javascript
+    iframe->>dotcom: iframe ready
+    dotcom->>iframe: set mermaid data on iframe
+    iframe->>iframe: render mermaid
+```
 ---
 
 ## 1) Auto Fix Style (`auto-fix.yml`)
