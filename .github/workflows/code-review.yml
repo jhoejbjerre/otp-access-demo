@@ -1,4 +1,4 @@
-name: Multi-Tech Code Review with SonarQube + Auto Project Creation
+name: Automated Code Review
 
 on:
   pull_request:
