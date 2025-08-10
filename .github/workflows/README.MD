@@ -85,6 +85,7 @@ flowchart TD
   CR_checks --> PR[PR status checks:
   lint-csharp / lint-bicep / lint-frontend / sonar-review
   + umbrella Automated Code Review]
+
 ---
 
 ## 1) Auto Fix Style (`auto-fix.yml`)
