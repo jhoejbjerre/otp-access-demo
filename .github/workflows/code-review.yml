@@ -91,7 +91,7 @@ jobs:
           for file in $(find . -name '*.bicep'); do
             out="bicep-json/$(basename $file .bicep).json"
             echo "Compiling $file to $out"
-            bicep build $file --outdir bicep-json
+            bicep build "$file" --outdir bicep-json
           done
 
       - name: Start SonarQube with HTML report plugin
@@ -110,23 +110,28 @@ jobs:
       - name: Create SonarQube admin token
         run: |
           TOKEN_NAME="ci-token"
-          SONAR_TOKEN=$(curl -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate?name=${TOKEN_NAME}" | jq -r .token)
+          SONAR_TOKEN=$(curl -u admin:admin -X POST \
+            "http://localhost:9000/api/user_tokens/generate?name=${TOKEN_NAME}" | jq -r .token)
           echo "SONAR_TOKEN=$SONAR_TOKEN" >> $GITHUB_ENV
-          curl -u admin:admin -X POST "http://localhost:9000/api/users/change_password?login=admin&previousPassword=admin&password=newadminpass"
+          curl -u admin:admin -X POST \
+            "http://localhost:9000/api/users/change_password?login=admin&previousPassword=admin&password=newadminpass"
 
       - name: Ensure SonarQube Project exists
         run: |
-          PROJECT_KEY="my_project_key"
-          if ! curl -s -u ${SONAR_TOKEN}: http://localhost:9000/api/projects/search?projects=$PROJECT_KEY | grep -q $PROJECT_KEY; then
+          PROJECT_KEY="otp-access-demo-${{ github.repository }}"
+          if ! curl -s -u ${SONAR_TOKEN}: \
+            "http://localhost:9000/api/projects/search?projects=$PROJECT_KEY" | grep -q $PROJECT_KEY; then
             echo "Creating SonarQube project: $PROJECT_KEY"
-            curl -s -u ${SONAR_TOKEN}: -X POST "http://localhost:9000/api/projects/create?name=My%20Project&project=$PROJECT_KEY"
+            curl -s -u ${SONAR_TOKEN}: -X POST \
+              "http://localhost:9000/api/projects/create?name=OTP%20Access%20Demo&project=$PROJECT_KEY"
           fi
+          echo "PROJECT_KEY=$PROJECT_KEY" >> $GITHUB_ENV
 
       - name: Create sonar-project.properties
         run: |
           cat <<EOF > sonar-project.properties
-          sonar.projectKey=my_project_key
-          sonar.projectName=My Project
+          sonar.projectKey=${{ env.PROJECT_KEY }}
+          sonar.projectName=OTP Access Demo
           sonar.projectVersion=1.0
           sonar.sources=.,bicep-json
           sonar.exclusions=**/bin/**,**/obj/**,**/node_modules/**,**/*.dll
@@ -148,14 +153,14 @@ jobs:
       - name: Generate HTML report
         run: |
           curl -s -u admin:newadminpass \
-            "http://localhost:9000/api/cnesreport/report?format=html&key=my_project_key" \
+            "http://localhost:9000/api/cnesreport/report?format=html&key=${{ env.PROJECT_KEY }}" \
             -o sonar-report.html
 
       - name: Generate JSON summary
         id: summary
         run: |
           SUMMARY_JSON=$(curl -s -u admin:newadminpass \
-            "http://localhost:9000/api/cnesreport/report?format=json&key=my_project_key")
+            "http://localhost:9000/api/cnesreport/report?format=json&key=${{ env.PROJECT_KEY }}")
 
           TOTAL_ISSUES=$(echo "$SUMMARY_JSON" | jq '.total_issues')
           BLOCKER=$(echo "$SUMMARY_JSON" | jq '.severity.BLOCKER // 0')
@@ -179,7 +184,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             🛠 **SonarQube Code Review Result (multi-language)**
-            - Project: `my_project_key`
+            - Project: `${{ env.PROJECT_KEY }}`
             - Quality Gate: ✅ / ❌ (see Actions logs)
             - ${{ env.SUMMARY_MARKDOWN }}
             - [📄 Download full HTML report from workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
