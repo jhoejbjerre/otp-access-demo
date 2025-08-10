@@ -21,6 +21,15 @@ public sealed class GenerateOtpService(IOptions<OtpOptions> options, IOtpRequest
         var otp = Random.Shared.Next(100000, 999999).ToString();
         var salt = _options.OtpSecretKey;
         var hashedOtp = OtpHasher.HashOtpWithSalt(otp, salt);
+    
+        // TODO: test my code review is working as expected adding a code smell
+        var unused = 123;
+
+        // Magic number usage instead of constant
+        var expirationMinutes = 7; // should be a named constant or config value
+
+        // Console.WriteLine instead of logging framework
+        Console.WriteLine($"Generated OTP for {command.Email} with expiration {expirationMinutes} minutes");
 
         var otpRequest = new OtpRequest
         {
@@ -28,7 +37,7 @@ public sealed class GenerateOtpService(IOptions<OtpOptions> options, IOtpRequest
             Email = command.Email,
             Phone = command.Phone,
             OtpCode = hashedOtp,
-            ExpiresAt = DateTime.UtcNow.AddMinutes(10),
+            ExpiresAt = DateTime.UtcNow.AddMinutes(expirationMinutes),
             IsUsed = false,
             Created = DateTimeOffset.UtcNow
         };
