@@ -1,0 +1,185 @@
+name: Multi-Tech Code Review with SonarQube + Auto Project Creation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: code-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      cs: ${{ steps.filter.outputs.cs }}
+      bicep: ${{ steps.filter.outputs.bicep }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            cs:
+              - '**/*.cs'
+            bicep:
+              - '**/*.bicep'
+            frontend:
+              - '**/*.js'
+              - '**/*.ts'
+              - '**/*.tsx'
+
+  lint-csharp:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.cs == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore
+      - run: dotnet build --no-restore
+      - run: dotnet format --verify-no-changes
+
+  lint-bicep:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.bicep == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: az bicep install
+      - run: bicep build ./infra/**/*.bicep
+      - run: bicep lint ./infra/**/*.bicep
+
+  lint-frontend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npm run lint
+
+  sonar-review:
+    needs: [lint-csharp, lint-bicep, lint-frontend]
+    if: |
+      needs.detect-changes.outputs.cs == 'true' ||
+      needs.detect-changes.outputs.bicep == 'true' ||
+      needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bicep CLI
+        run: az bicep install
+
+      - name: Compile Bicep to JSON
+        run: |
+          mkdir -p bicep-json
+          for file in $(find . -name '*.bicep'); do
+            out="bicep-json/$(basename $file .bicep).json"
+            echo "Compiling $file to $out"
+            bicep build $file --outdir bicep-json
+          done
+
+      - name: Start SonarQube with HTML report plugin
+        run: |
+          docker run -d --name sonarqube \
+            -p 9000:9000 \
+            ghcr.io/<org>/sonarqube-community-report:latest
+          echo "Waiting for SonarQube..."
+          for i in {1..30}; do
+            if curl -s http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
+              break
+            fi
+            sleep 5
+          done
+
+      - name: Create SonarQube admin token
+        run: |
+          TOKEN_NAME="ci-token"
+          SONAR_TOKEN=$(curl -u admin:admin -X POST "http://localhost:9000/api/user_tokens/generate?name=${TOKEN_NAME}" | jq -r .token)
+          echo "SONAR_TOKEN=$SONAR_TOKEN" >> $GITHUB_ENV
+          curl -u admin:admin -X POST "http://localhost:9000/api/users/change_password?login=admin&previousPassword=admin&password=newadminpass"
+
+      - name: Ensure SonarQube Project exists
+        run: |
+          PROJECT_KEY="my_project_key"
+          if ! curl -s -u ${SONAR_TOKEN}: http://localhost:9000/api/projects/search?projects=$PROJECT_KEY | grep -q $PROJECT_KEY; then
+            echo "Creating SonarQube project: $PROJECT_KEY"
+            curl -s -u ${SONAR_TOKEN}: -X POST "http://localhost:9000/api/projects/create?name=My%20Project&project=$PROJECT_KEY"
+          fi
+
+      - name: Create sonar-project.properties
+        run: |
+          cat <<EOF > sonar-project.properties
+          sonar.projectKey=my_project_key
+          sonar.projectName=My Project
+          sonar.projectVersion=1.0
+          sonar.sources=.,bicep-json
+          sonar.exclusions=**/bin/**,**/obj/**,**/node_modules/**,**/*.dll
+          sonar.dotnet.excludeTestProjects=true
+          sonar.javascript.lcov.reportPaths=coverage/lcov.info
+          sonar.typescript.tsconfigPath=tsconfig.json
+          sonar.json.fileSuffixes=.json
+          sonar.sourceEncoding=UTF-8
+          EOF
+
+      - name: SonarQube Scan (multi-language)
+        uses: SonarSource/sonarqube-scan-action@v2
+        with:
+          projectBaseDir: .
+        env:
+          SONAR_HOST_URL: http://localhost:9000
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+      - name: Generate HTML report
+        run: |
+          curl -s -u admin:newadminpass \
+            "http://localhost:9000/api/cnesreport/report?format=html&key=my_project_key" \
+            -o sonar-report.html
+
+      - name: Generate JSON summary
+        id: summary
+        run: |
+          SUMMARY_JSON=$(curl -s -u admin:newadminpass \
+            "http://localhost:9000/api/cnesreport/report?format=json&key=my_project_key")
+
+          TOTAL_ISSUES=$(echo "$SUMMARY_JSON" | jq '.total_issues')
+          BLOCKER=$(echo "$SUMMARY_JSON" | jq '.severity.BLOCKER // 0')
+          CRITICAL=$(echo "$SUMMARY_JSON" | jq '.severity.CRITICAL // 0')
+          MAJOR=$(echo "$SUMMARY_JSON" | jq '.severity.MAJOR // 0')
+          MINOR=$(echo "$SUMMARY_JSON" | jq '.severity.MINOR // 0')
+          INFO=$(echo "$SUMMARY_JSON" | jq '.severity.INFO // 0')
+
+          echo "SUMMARY_MARKDOWN=**Issues:** $TOTAL_ISSUES  \n- 🔴 Blocker: $BLOCKER  \n- 🟠 Critical: $CRITICAL  \n- 🟡 Major: $MAJOR  \n- 🔵 Minor: $MINOR  \n- ⚪ Info: $INFO" >> $GITHUB_ENV
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonar-html-report
+          path: sonar-report.html
+
+      - name: Post PR comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🛠 **SonarQube Code Review Result (multi-language)**
+            - Project: `my_project_key`
+            - Quality Gate: ✅ / ❌ (see Actions logs)
+            - ${{ env.SUMMARY_MARKDOWN }}
+            - [📄 Download full HTML report from workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
