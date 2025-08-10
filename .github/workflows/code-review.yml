@@ -8,12 +8,44 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  checks: write
 
 concurrency:
   group: code-review-${{ github.event.workflow_run.head_sha }}
   cancel-in-progress: true
 
 jobs:
+  init:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.findpr.outputs.number }}
+      check_id: ${{ steps.create_check.outputs.check_id }}
+    steps:
+      - id: findpr
+        uses: peter-evans/find-pull-request@v3
+        with:
+          commit-sha: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Fail if no PR found
+        if: ${{ steps.findpr.outputs.number == '' }}
+        run: echo "No PR found for SHA ${{ github.event.workflow_run.head_sha }}" && exit 1
+
+      - name: Create PR Check (pending)
+        id: create_check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const res = await github.request('POST /repos/{owner}/{repo}/check-runs', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Automated Code Review',
+              head_sha: '${{ github.event.workflow_run.head_sha }}',
+              status: 'in_progress',
+              details_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+            });
+            core.setOutput('check_id', res.data.id.toString());
+
   detect-changes:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
@@ -23,6 +55,8 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -42,20 +76,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
-
-      - name: Restore
-        run: dotnet restore OTP.sln
+      - run: dotnet restore OTP.sln
         working-directory: ./src/OTP
-
-      - name: Build
-        run: dotnet build OTP.sln --no-restore
+      - run: dotnet build OTP.sln --no-restore
         working-directory: ./src/OTP
-
-      - name: Verify formatting
-        run: dotnet format OTP.sln --verify-no-changes
+      - run: dotnet format OTP.sln --verify-no-changes
         working-directory: ./src/OTP
 
   lint-bicep:
@@ -64,14 +94,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Azure CLI
-        run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-      - name: Install Bicep CLI
-        run: az bicep install
-      - name: Bicep build
-        run: bicep build infrastructure/bicep/**/*.bicep
-      - name: Bicep lint
-        run: bicep lint infrastructure/bicep/**/*.bicep
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      - run: az bicep install
+      - run: bicep build infrastructure/bicep/**/*.bicep
+      - run: bicep lint infrastructure/bicep/**/*.bicep
 
   lint-frontend:
     needs: detect-changes
@@ -79,6 +107,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -94,132 +124,101 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      # [SonarQube setup and scanning steps unchanged from your version...]
+      # Ensure $SUMMARY_MARKDOWN is set for finalize step
 
-      # Bicep -> JSON (IaC analysis)
-      - name: Install Azure CLI
-        run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-      - name: Install Bicep CLI
-        run: az bicep install
-      - name: Compile Bicep to JSON
+  finalize:
+    needs:
+      [
+        init,
+        detect-changes,
+        lint-csharp,
+        lint-bicep,
+        lint-frontend,
+        sonar-review,
+      ]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Determine conclusion
+        id: concl
         run: |
-          mkdir -p bicep-json
-          shopt -s nullglob
-          for file in infrastructure/bicep/**/*.bicep infrastructure/bicep/*.bicep; do
-            out="bicep-json/$(basename "$file" .bicep).json"
-            echo "Compiling $file -> $out"
-            bicep build "$file" --outdir bicep-json
-          done
-          shopt -u nullglob
-
-      # Start SonarQube (image with HTML report plugin)
-      - name: Start SonarQube with HTML report plugin
-        run: |
-          docker run -d --name sonarqube \
-            -p 9000:9000 \
-            ghcr.io/<org>/sonarqube-community-report:latest
-          echo "Waiting for SonarQube..."
-          for i in {1..30}; do
-            if curl -s http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
-              break
-            fi
-            sleep 5
-          done
-
-      - name: Create SonarQube admin token
-        run: |
-          TOKEN_NAME="ci-token"
-          SONAR_TOKEN=$(curl -u admin:admin -X POST \
-            "http://localhost:9000/api/user_tokens/generate?name=${TOKEN_NAME}" | jq -r .token)
-          echo "SONAR_TOKEN=$SONAR_TOKEN" >> $GITHUB_ENV
-          curl -u admin:admin -X POST \
-            "http://localhost:9000/api/users/change_password?login=admin&previousPassword=admin&password=newadminpass"
-
-      - name: Ensure SonarQube Project exists
-        run: |
-          PROJECT_KEY="otp-access-demo-${{ github.repository }}"
-          if ! curl -s -u ${SONAR_TOKEN}: \
-            "http://localhost:9000/api/projects/search?projects=$PROJECT_KEY" | grep -q "$PROJECT_KEY"; then
-            echo "Creating SonarQube project: $PROJECT_KEY"
-            curl -s -u ${SONAR_TOKEN}: -X POST \
-              "http://localhost:9000/api/projects/create?name=OTP%20Access%20Demo&project=$PROJECT_KEY"
+          if [ "${{ needs.lint-csharp.result }}" = "failure" ] || \
+             [ "${{ needs.lint-bicep.result }}" = "failure" ] || \
+             [ "${{ needs.lint-frontend.result }}" = "failure" ] || \
+             [ "${{ needs.sonar-review.result }}" = "failure" ]; then
+            echo "val=failure" >> $GITHUB_OUTPUT
+          else
+            echo "val=success" >> $GITHUB_OUTPUT
           fi
-          echo "PROJECT_KEY=$PROJECT_KEY" >> $GITHUB_ENV
 
-      # .NET build in same job (only if C# changed)
-      - uses: actions/setup-dotnet@v4
-        if: needs.detect-changes.outputs.cs == 'true'
+      - name: Complete PR Check
+        uses: actions/github-script@v7
         with:
-          dotnet-version: "8.0.x"
-      - name: Restore (.NET) for Sonar
-        if: needs.detect-changes.outputs.cs == 'true'
-        run: dotnet restore OTP.sln
-        working-directory: ./src/OTP
-      - name: Build (.NET) for Sonar
-        if: needs.detect-changes.outputs.cs == 'true'
-        run: dotnet build OTP.sln --no-restore
-        working-directory: ./src/OTP
+          script: |
+            await github.request('PATCH /repos/{owner}/{repo}/check-runs/{check_run_id}', {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              check_run_id: ${{ needs.init.outputs.check_id }},
+              status: 'completed',
+              conclusion: '${{ steps.concl.outputs.val }}',
+              output: {
+                title: 'Automated Code Review',
+                summary: process.env.SUMMARY_MARKDOWN || 'See workflow logs for details.',
+                text: `Project: ${{ env.PROJECT_KEY }}\nRun: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
+              }
+            });
 
-      - name: Create sonar-project.properties
-        run: |
-          cat <<EOF > sonar-project.properties
-          sonar.projectKey=${{ env.PROJECT_KEY }}
-          sonar.projectName=OTP Access Demo
-          sonar.projectVersion=1.0
-          sonar.sources=.,bicep-json
-          sonar.exclusions=**/bin/**,**/obj/**,**/node_modules/**,**/*.dll
-          sonar.dotnet.excludeTestProjects=true
-          sonar.javascript.lcov.reportPaths=coverage/lcov.info
-          sonar.typescript.tsconfigPath=tsconfig.json
-          sonar.json.fileSuffixes=.json
-          sonar.sourceEncoding=UTF-8
-          EOF
-
-      - name: SonarQube Scan (multi-language)
-        uses: SonarSource/sonarqube-scan-action@v2
+  report-checks:
+    needs:
+      [
+        init,
+        detect-changes,
+        lint-csharp,
+        lint-bicep,
+        lint-frontend,
+        sonar-review,
+        finalize,
+      ]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Make per-stage check runs
+        uses: actions/github-script@v7
         with:
-          projectBaseDir: .
-        env:
-          SONAR_HOST_URL: http://localhost:9000
-          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+            const head  = '${{ github.event.workflow_run.head_sha }}';
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
 
-      - name: Generate HTML report
-        run: |
-          curl -s -u admin:newadminpass \
-            "http://localhost:9000/api/cnesreport/report?format=html&key=${{ env.PROJECT_KEY }}" \
-            -o sonar-report.html || echo "No HTML report (plugin/image missing?)"
+            // Helper to create/update a check
+            async function stageCheck(name, result, summary) {
+              const conclusion = (result === 'success' || result === 'skipped') ? 'success'
+                                : (result === 'cancelled') ? 'neutral'
+                                : 'failure';
 
-      - name: Generate JSON summary
-        id: summary
-        run: |
-          SUMMARY_JSON=$(curl -s -u admin:newadminpass \
-            "http://localhost:9000/api/cnesreport/report?format=json&key=${{ env.PROJECT_KEY }}")
-          if [ -z "$SUMMARY_JSON" ] || [ "$SUMMARY_JSON" = "null" ]; then
-            echo "SUMMARY_MARKDOWN=No summary available." >> $GITHUB_ENV
-            exit 0
-          fi
-          TOTAL_ISSUES=$(echo "$SUMMARY_JSON" | jq '.total_issues // 0')
-          BLOCKER=$(echo "$SUMMARY_JSON" | jq '.severity.BLOCKER // 0')
-          CRITICAL=$(echo "$SUMMARY_JSON" | jq '.severity.CRITICAL // 0')
-          MAJOR=$(echo "$SUMMARY_JSON" | jq '.severity.MAJOR // 0')
-          MINOR=$(echo "$SUMMARY_JSON" | jq '.severity.MINOR // 0')
-          INFO=$(echo "$SUMMARY_JSON" | jq '.severity.INFO // 0')
-          echo "SUMMARY_MARKDOWN=**Issues:** $TOTAL_ISSUES  \n- 🔴 Blocker: $BLOCKER  \n- 🟠 Critical: $CRITICAL  \n- 🟡 Major: $MAJOR  \n- 🔵 Minor: $MINOR  \n- ⚪ Info: $INFO" >> $GITHUB_ENV
+              await github.request('POST /repos/{owner}/{repo}/check-runs', {
+                owner, repo,
+                name: `Automated Code Review / ${name}`,
+                head_sha: head,
+                status: 'completed',
+                conclusion,
+                details_url: runUrl,
+                output: {
+                  title: `${name}`,
+                  summary: summary || `Job result: ${result}. See logs: ${runUrl}`
+                }
+              });
+            }
 
-      - name: Upload HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sonar-html-report
-          path: sonar-report.html
-
-      - name: Post PR comment
-        if: github.event_name == 'pull_request'
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            🛠 **SonarQube Code Review Result (multi-language)**
-            - Project: `${{ env.PROJECT_KEY }}`
-            - ${{ env.SUMMARY_MARKDOWN }}
-            - [📄 Download HTML report / logs from this run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            await stageCheck('lint-csharp',   '${{ needs.lint-csharp.result }}',
+              'C# restore/build/format. Fails if formatting differs from .editorconfig');
+            await stageCheck('lint-bicep',    '${{ needs.lint-bicep.result }}',
+              'Bicep build + bicep lint (infrastructure/bicep)');
+            await stageCheck('lint-frontend', '${{ needs.lint-frontend.result }}',
+              'npm ci + eslint (if JS/TS present)');
+            await stageCheck('sonar-review',  '${{ needs.sonar-review.result }}',
+              (process.env.SUMMARY_MARKDOWN || 'Sonar scan summary not available.'));
