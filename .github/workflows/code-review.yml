@@ -89,16 +89,18 @@ jobs:
         run: |
           mkdir -p bicep-json
           for file in $(find . -name '*.bicep'); do
+            out="bicep-json/$(basename $file .bicep).json"
+            echo "Compiling $file to $out"
             bicep build "$file" --outdir bicep-json
           done
 
-      - name: Start SonarQube Community Edition
+      - name: Start SonarQube with HTML report plugin
         run: |
           docker run -d --name sonarqube \
             -p 9000:9000 \
-            sonarqube:lts-community
+            ghcr.io/<org>/sonarqube-community-report:latest
           echo "Waiting for SonarQube..."
-          for i in {1..40}; do
+          for i in {1..30}; do
             if curl -s http://localhost:9000/api/system/status | grep -q '"status":"UP"'; then
               break
             fi
