@@ -1,4 +1,4 @@
-name: Multi-Tech Code Review with SonarQube + Auto Project Creation
+name: Automated Code Review
 
 on:
   pull_request:
@@ -43,15 +43,18 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
+
       - name: Restore
-        run: dotnet restore otp.sln
+        run: dotnet restore OTP.sln
         working-directory: ./src/OTP
+
       - name: Build
-        run: dotnet build otp.sln --no-restore
+        run: dotnet build OTP.sln --no-restore
         working-directory: ./src/OTP
+
       - name: Verify formatting
-        run: dotnet format otp.sln --verify-no-changes
+        run: dotnet format OTP.sln --verify-no-changes
         working-directory: ./src/OTP
 
   lint-bicep:
@@ -145,14 +148,14 @@ jobs:
       - uses: actions/setup-dotnet@v4
         if: needs.detect-changes.outputs.cs == 'true'
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
       - name: Restore (.NET) for Sonar
         if: needs.detect-changes.outputs.cs == 'true'
-        run: dotnet restore otp.sln
+        run: dotnet restore OTP.sln
         working-directory: ./src/OTP
       - name: Build (.NET) for Sonar
         if: needs.detect-changes.outputs.cs == 'true'
-        run: dotnet build otp.sln --no-restore
+        run: dotnet build OTP.sln --no-restore
         working-directory: ./src/OTP
 
       - name: Create sonar-project.properties
