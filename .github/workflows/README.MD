@@ -25,18 +25,21 @@ Three workflows handle the full lifecycle:
 ```mermaid
 flowchart TD
   %% Triggers
-  A[Pull Request<br/>opened / synchronize / reopened] --> AF[Auto Fix Style workflow]
+  A[Pull Request
+  opened / synchronize / reopened] --> AF[Auto Fix Style workflow]
 
   %% Auto Fix
-  subgraph G1[Auto Fix Style (auto-fix.yml)]
+  subgraph G1["Auto Fix Style auto-fix.yml"]
     direction LR
-    AF --> AF_detect[detect-changes<br/>(paths-filter)]
-    AF_detect -->|C# changed| AF_cs[dotnet format OTP.sln<br/>+ analyzers]
-    AF_detect -->|Bicep changed| AF_bicep[bicep format<br/>(infrastructure/bicep/**)]
-    AF_detect -->|JS/TS changed| AF_js[eslint --fix]
-    AF_cs --> AF_commit[Auto-commit<br/>[autofix] + [skip ci]]
+    AF --> AF_detect[detect-changes
+    paths-filter]
+    AF_detect -->|C# changed| AF_cs[dotnet format OTP.sln
+    + analyzers]
+    AF_detect -->|Bicep changed| AF_bicep[bicep format
+    infrastructure/bicep/**]
+    AF_detect -->|JS/TS changed| AF_js[eslint --fix] 
+    AF_cs --> AF_commit[Auto-commit autofix + skip ci]
     AF_bicep --> AF_commit
-    AF_js --> AF_commit
     AF_detect -->|No relevant changes| AF_skip[Skip autofix]
   end
 
@@ -45,31 +48,43 @@ flowchart TD
   AF_skip -->|still completes| CR
 
   %% Code Review
-  subgraph G2[Automated Code Review (code-review.yml)]
+  subgraph G2["Automated Code Review code-review.yml"]
     direction LR
-    CR --> CR_init[init<br/>find PR for SHA + resolve current head SHA]
-    CR_init --> CR_detect[detect-changes<br/>(paths-filter)]
-    CR_detect -->|C# changed| CR_cs[lint-csharp:<br/>restore, build,<br/>verify formatting]
-    CR_detect -->|Bicep changed| CR_bicep[lint-bicep:<br/>bicep build + lint]
-    CR_detect -->|JS/TS changed| CR_fe[lint-frontend:<br/>npm ci + npm run lint]
+    CR --> CR_init[init
+    find PR for SHA + resolve current head SHA]
+    CR_init --> CR_detect[detect-changes
+    paths-filter]
+    CR_detect -->|C# changed| CR_cs[lint-csharp:
+    restore, build, NEWLINE verify formatting]
+    CR_detect -->|Bicep changed| CR_bicep[lint-bicep:
+    bicep build + lint]
+    CR_detect -->|JS/TS changed| CR_fe[lint-frontend:
+    npm ci + npm run lint]
     CR_detect -->|No relevant changes| CR_no[Skip linters]
 
     %% Sonar conditional
     CR_cs -.-> CR_sonar
     CR_bicep -.-> CR_sonar
     CR_fe -.-> CR_sonar
-    CR_sonar{All executed linters<br/>succeeded?}
-    CR_sonar -->|Yes| CR_scan[sonar-review:<br/>containerized SonarQube]
-    CR_sonar -->|No| CR_skip_sonar[Skip Sonar (fail fast)]
+    CR_sonar{All executed linters
+    succeeded?}
+    CR_sonar -->|Yes| CR_scan[sonar-review:
+    containerized SonarQube]
+    CR_sonar -->|No| CR_skip_sonar[Skip Sonar
+    fail fast]
 
     %% Finalize and checks
-    CR_scan --> CR_finalize[finalize:<br/>umbrella conclusion]
+    CR_scan --> CR_finalize[finalize:
+    umbrella conclusion]
     CR_skip_sonar --> CR_finalize
-    CR_finalize --> CR_checks[report-checks:<br/>publish per-stage PR checks]
+    CR_finalize --> CR_checks[report-checks:
+    publish per-stage PR checks]
   end
 
   %% Output to PR
-  CR_checks --> PR[PR status checks:<br/>lint-csharp / lint-bicep / lint-frontend / sonar-review<br/>+ umbrella “Automated Code Review”]```
+  CR_checks --> PR[PR status checks:
+  lint-csharp / lint-bicep / lint-frontend / sonar-review
+  + umbrella Automated Code Review]
 ---
 
 ## 1) Auto Fix Style (`auto-fix.yml`)
