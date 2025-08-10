@@ -40,6 +40,7 @@ Three workflows handle the full lifecycle:
 - `[skip ci]` prevents the workflow from triggering itself again.
 
 **Diagram**
+
 ![Auto Fix Style Workflow](./auto-fixture-diagram.png)
 
 ---
@@ -71,6 +72,7 @@ Three workflows handle the full lifecycle:
 - Umbrella: `Automated Code Review`
 
 **Diagram**
+
 ![Automated Code Review Workflow](./code-review-diagram.png)
 
 ---
