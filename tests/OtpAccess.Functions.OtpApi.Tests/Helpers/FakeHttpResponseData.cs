@@ -34,8 +34,5 @@ public sealed class FakeHttpResponseData(HttpRequestData request) : HttpResponse
         return reader.ReadToEnd();
     }
 
-    public void Dispose()
-    {
-        throw new NotImplementedException();
-    }
+    public void Dispose() => throw new NotImplementedException();
 }

@@ -31,8 +31,5 @@ public sealed class FakeHttpRequestData(FunctionContext functionContext, string 
 
     public override HttpResponseData CreateResponse() => new FakeHttpResponseData(this);
 
-    public void Dispose()
-    {
-        throw new NotImplementedException();
-    }
+    public void Dispose() => throw new NotImplementedException();
 }
