@@ -21,9 +21,8 @@ public sealed class GenerateOtpService(IOptions<OtpOptions> options, IOtpRequest
         var otp = Random.Shared.Next(100000, 999999).ToString();
         var salt = _options.OtpSecretKey;
         var hashedOtp = OtpHasher.HashOtpWithSalt(otp, salt);
-    
+
         // TODO: test my code review is working as expected adding a code smell
-        var unused = 123;
 
         // Magic number usage instead of constant
         var expirationMinutes = 7; // should be a named constant or config value

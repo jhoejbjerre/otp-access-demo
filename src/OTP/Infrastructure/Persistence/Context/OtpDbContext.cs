@@ -5,7 +5,7 @@ namespace Infrastructure.Persistence.Context;
 
 public class OtpDbContext(DbContextOptions<OtpDbContext> options) : DbContext(options)
 {
-      public DbSet<OtpRequest> OtpRequests => Set<OtpRequest>();
+    public DbSet<OtpRequest> OtpRequests => Set<OtpRequest>();
 
     protected override void OnModelCreating(ModelBuilder builder) => ConfigureOtpRequestEntity(builder);
 

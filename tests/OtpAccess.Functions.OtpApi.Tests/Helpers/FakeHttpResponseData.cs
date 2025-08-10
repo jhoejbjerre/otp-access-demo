@@ -17,7 +17,7 @@ public sealed class FakeHttpResponseData(HttpRequestData request) : HttpResponse
     public override Stream Body
     {
         get => _bodyStream;
-        set => _bodyStream = (MemoryStream) value;
+        set => _bodyStream = (MemoryStream)value;
     }
 
     public override HttpHeadersCollection Headers { get; set; } = [];

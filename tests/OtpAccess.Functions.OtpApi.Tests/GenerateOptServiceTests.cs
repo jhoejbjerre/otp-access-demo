@@ -19,7 +19,7 @@ public sealed class GenerateOtpServiceTests
     public GenerateOtpServiceTests()
     {
         _repositoryMock = new Mock<IOtpRequestRepository>();
-        var options = Options.Create(new OtpOptions {OtpSecretKey = "fake-secret"});
+        var options = Options.Create(new OtpOptions { OtpSecretKey = "fake-secret" });
         _service = new GenerateOtpService(options, _repositoryMock.Object);
     }
 

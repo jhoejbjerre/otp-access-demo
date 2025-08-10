@@ -17,22 +17,16 @@ namespace Infrastructure.Persistence.Repositories;
 ///     It is included solely to demonstrate that database-related operations are observable through logging,
 ///     such as viewing activity in Application Insights during development and testing.
 /// </remarks>
-public sealed class OtpRequestRepository : IOtpRequestRepository
+/// <remarks>
+/// </remarks>
+/// <param name="dbContext"></param>
+/// <param name="logger"></param>
+public sealed class OtpRequestRepository(
+    OtpDbContext dbContext,
+    ILogger<OtpRequestRepository> logger) : IOtpRequestRepository
 {
-    private readonly OtpDbContext _dbContext;
-    private readonly ILogger<OtpRequestRepository> _logger;
-
-    /// <summary>
-    /// </summary>
-    /// <param name="dbContext"></param>
-    /// <param name="logger"></param>
-    public OtpRequestRepository(
-        OtpDbContext dbContext,
-        ILogger<OtpRequestRepository> logger)
-    {
-        _dbContext = dbContext;
-        _logger = logger;
-    }
+    private readonly OtpDbContext _dbContext = dbContext;
+    private readonly ILogger<OtpRequestRepository> _logger = logger;
 
     /// <inheritdoc />
     public async Task AddAsync(OtpRequest entity, CancellationToken cancellationToken = default)
