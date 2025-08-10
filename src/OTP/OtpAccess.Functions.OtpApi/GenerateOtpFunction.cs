@@ -2,11 +2,15 @@ using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+
 using Application.Interfaces;
+
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
+
 using OtpAccess.Functions.OtpApi.Models.Requests;
 using OtpAccess.Functions.OtpApi.Services;
 
@@ -26,28 +30,28 @@ public sealed class GenerateOtpFunction(
 
         try
         {
-            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            var dto = JsonConvert.DeserializeObject<GenerateOtpRequest>(requestBody);
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            GenerateOtpRequest dto = JsonConvert.DeserializeObject<GenerateOtpRequest>(requestBody);
 
             if (dto is null || string.IsNullOrWhiteSpace(dto.Email))
             {
                 logger.LogError("Missing or invalid Email.");
-                var badRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                HttpResponseData badRequest = req.CreateResponse(HttpStatusCode.BadRequest);
                 await badRequest.WriteStringAsync("Missing or invalid Email.");
                 return badRequest;
             }
 
-            var command = generateOtpCommandFactory.Create(dto);
-            var otp = await otpService.GenerateOtpAsync(command);
+            Application.Commands.GenerateOtpCommand command = generateOtpCommandFactory.Create(dto);
+            string otp = await otpService.GenerateOtpAsync(command);
 
-            var response = req.CreateResponse(HttpStatusCode.OK);
+            HttpResponseData response = req.CreateResponse(HttpStatusCode.OK);
             await response.WriteStringAsync($"OTP generated for {command.Email}: {otp}");
             return response;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unhandled exception occurred while generating OTP.");
-            var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
+            HttpResponseData errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
             await errorResponse.WriteStringAsync("An unexpected error occurred.");
             return errorResponse;
         }

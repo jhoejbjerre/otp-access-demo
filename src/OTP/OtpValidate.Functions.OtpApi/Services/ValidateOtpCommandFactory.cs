@@ -1,4 +1,5 @@
-﻿using Application.Commands;
+using Application.Commands;
+
 using OtpValidate.Functions.OtpApi.Models.Requests;
 
 namespace OtpValidate.Functions.OtpApi.Services;

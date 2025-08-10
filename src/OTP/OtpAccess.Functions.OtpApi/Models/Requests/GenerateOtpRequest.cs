@@ -1,4 +1,4 @@
-﻿namespace OtpAccess.Functions.OtpApi.Models.Requests;
+namespace OtpAccess.Functions.OtpApi.Models.Requests;
 
 public sealed record GenerateOtpRequest(
     string Email,

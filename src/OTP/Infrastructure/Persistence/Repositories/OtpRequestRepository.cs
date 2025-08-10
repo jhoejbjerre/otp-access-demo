@@ -1,6 +1,8 @@
-﻿using Domain.Entities;
+using Domain.Entities;
 using Domain.Interfaces;
+
 using Infrastructure.Persistence.Context;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -17,27 +19,21 @@ namespace Infrastructure.Persistence.Repositories;
 ///     It is included solely to demonstrate that database-related operations are observable through logging,
 ///     such as viewing activity in Application Insights during development and testing.
 /// </remarks>
-public sealed class OtpRequestRepository : IOtpRequestRepository
+/// <remarks>
+/// </remarks>
+/// <param name="dbContext"></param>
+/// <param name="logger"></param>
+public sealed class OtpRequestRepository(
+    OtpDbContext dbContext,
+    ILogger<OtpRequestRepository> logger) : IOtpRequestRepository
 {
-    private readonly OtpDbContext _dbContext;
-    private readonly ILogger<OtpRequestRepository> _logger;
-
-    /// <summary>
-    /// </summary>
-    /// <param name="dbContext"></param>
-    /// <param name="logger"></param>
-    public OtpRequestRepository(
-        OtpDbContext dbContext,
-        ILogger<OtpRequestRepository> logger)
-    {
-        _dbContext = dbContext;
-        _logger = logger;
-    }
+    private readonly OtpDbContext _dbContext = dbContext;
+    private readonly ILogger<OtpRequestRepository> _logger = logger;
 
     /// <inheritdoc />
     public async Task AddAsync(OtpRequest entity, CancellationToken cancellationToken = default)
     {
-        await _dbContext.OtpRequests.AddAsync(entity, cancellationToken);
+        _ = await _dbContext.OtpRequests.AddAsync(entity, cancellationToken);
         _logger.LogInformation("Added new OTP request with Id '{Id}' for email '{Email}'.", entity.Id, entity.Email);
     }
 
@@ -45,7 +41,7 @@ public sealed class OtpRequestRepository : IOtpRequestRepository
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         _logger.LogDebug("Saving changes to database...");
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        _ = await _dbContext.SaveChangesAsync(cancellationToken);
         _logger.LogDebug("Changes saved successfully.");
     }
 
@@ -54,7 +50,7 @@ public sealed class OtpRequestRepository : IOtpRequestRepository
     {
         _logger.LogDebug("Attempting to mark OTP as used for email '{Email}'.", email);
 
-        var otpRequest = await _dbContext.OtpRequests
+        OtpRequest? otpRequest = await _dbContext.OtpRequests
                                          .FirstOrDefaultAsync(
                                              x => x.Email == email && x.OtpCode == hashedOtp && !x.IsUsed && x.ExpiresAt > DateTime.UtcNow,
                                              cancellationToken);

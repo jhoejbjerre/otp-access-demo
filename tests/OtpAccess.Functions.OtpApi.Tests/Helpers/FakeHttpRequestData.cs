@@ -1,5 +1,6 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using System.Text;
+
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -12,25 +13,23 @@ namespace OtpAccess.Functions.OtpApi.Tests.Helpers;
 ///     Other HTTP-related properties such as headers, cookies, method, and URL are initialized with safe defaults suitable
 ///     for testing.
 /// </summary>
-public sealed class FakeHttpRequestData : HttpRequestData
+public sealed class FakeHttpRequestData(FunctionContext functionContext, string body) : HttpRequestData(functionContext), IDisposable
 {
-    private readonly MemoryStream _bodyStream;
-
-    public FakeHttpRequestData(FunctionContext functionContext, string body)
-        : base(functionContext) =>
-        _bodyStream = new MemoryStream(Encoding.UTF8.GetBytes(body));
+    private readonly MemoryStream _bodyStream = new(Encoding.UTF8.GetBytes(body));
 
     public override Stream Body => _bodyStream;
 
-    public override HttpHeadersCollection Headers { get; } = new();
+    public override HttpHeadersCollection Headers { get; } = [];
 
-    public override IReadOnlyCollection<IHttpCookie> Cookies => Array.Empty<IHttpCookie>();
+    public override IReadOnlyCollection<IHttpCookie> Cookies => [];
 
     public override Uri Url => new("https://localhost");
 
-    public override IEnumerable<ClaimsIdentity> Identities => Array.Empty<ClaimsIdentity>();
+    public override IEnumerable<ClaimsIdentity> Identities => [];
 
     public override string Method => "POST";
 
     public override HttpResponseData CreateResponse() => new FakeHttpResponseData(this);
+
+    public void Dispose() => throw new NotImplementedException();
 }

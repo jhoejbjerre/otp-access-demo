@@ -1,4 +1,4 @@
-﻿namespace Application.Options;
+namespace Application.Options;
 
 public sealed class OtpOptions
 {

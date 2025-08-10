@@ -1,9 +1,13 @@
 using System.Net;
+
 using Application.Commands;
 using Application.Interfaces;
+
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+
 using Moq;
+
 using OtpAccess.Functions.OtpApi.Models.Requests;
 using OtpAccess.Functions.OtpApi.Services;
 using OtpAccess.Functions.OtpApi.Tests.Helpers;
@@ -22,11 +26,11 @@ public sealed class GenerateOtpFunctionTests
     public async Task Run_ReturnsBadRequest_WhenEmailIsMissing()
     {
         var function = new GenerateOtpFunction(_otpServiceMock.Object, _commandFactoryMock.Object, _loggerMock.Object);
-        var requestBody = @"{ ""phone"": ""+4512345678"" }";
+        string requestBody = /*lang=json,strict*/ @"{ ""phone"": ""+4512345678"" }";
 
         var req = new FakeHttpRequestData(_functionContext, requestBody);
 
-        var response = await function.Run(req, _functionContext);
+        Microsoft.Azure.Functions.Worker.Http.HttpResponseData response = await function.Run(req, _functionContext);
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
@@ -34,20 +38,20 @@ public sealed class GenerateOtpFunctionTests
     [Fact]
     public async Task Run_ReturnsOk_WhenEmailIsValid()
     {
-        _otpServiceMock
+        _ = _otpServiceMock
             .Setup(s => s.GenerateOtpAsync(It.IsAny<GenerateOtpCommand>(), CancellationToken.None))
             .ReturnsAsync("123456");
 
-        _commandFactoryMock
+        _ = _commandFactoryMock
             .Setup(f => f.Create(It.IsAny<GenerateOtpRequest>()))
             .Returns(new GenerateOtpCommand("test@example.com", "+4512345678"));
 
         var function = new GenerateOtpFunction(_otpServiceMock.Object, _commandFactoryMock.Object, _loggerMock.Object);
-        var requestBody = @"{ ""email"": ""test@example.com"", ""phone"": ""+4512345678"" }";
+        string requestBody = /*lang=json,strict*/ @"{ ""email"": ""test@example.com"", ""phone"": ""+4512345678"" }";
 
         var req = new FakeHttpRequestData(_functionContext, requestBody);
 
-        var response = await function.Run(req, _functionContext);
+        Microsoft.Azure.Functions.Worker.Http.HttpResponseData response = await function.Run(req, _functionContext);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }

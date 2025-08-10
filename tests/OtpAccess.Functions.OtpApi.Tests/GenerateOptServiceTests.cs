@@ -1,9 +1,12 @@
-﻿using Application.Commands;
+using Application.Commands;
 using Application.Options;
 using Application.Services;
+
 using Domain.Entities;
 using Domain.Interfaces;
+
 using Microsoft.Extensions.Options;
+
 using Moq;
 
 namespace OtpAccess.Functions.OtpApi.Tests;
@@ -19,7 +22,7 @@ public sealed class GenerateOtpServiceTests
     public GenerateOtpServiceTests()
     {
         _repositoryMock = new Mock<IOtpRequestRepository>();
-        var options = Options.Create(new OtpOptions {OtpSecretKey = "fake-secret"});
+        IOptions<OtpOptions> options = Options.Create(new OtpOptions { OtpSecretKey = "fake-secret" });
         _service = new GenerateOtpService(options, _repositoryMock.Object);
     }
 
@@ -30,17 +33,17 @@ public sealed class GenerateOtpServiceTests
         var command = new GenerateOtpCommand("test@example.com", "+4512345678");
         OtpRequest capturedRequest = null;
 
-        _repositoryMock
+        _ = _repositoryMock
             .Setup(r => r.AddAsync(It.IsAny<OtpRequest>(), It.IsAny<CancellationToken>()))
             .Callback<OtpRequest, CancellationToken>((r, _) => capturedRequest = r)
             .Returns(Task.CompletedTask);
 
-        _repositoryMock
+        _ = _repositoryMock
             .Setup(r => r.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         // Act
-        var otp = await _service.GenerateOtpAsync(command, CancellationToken.None);
+        string otp = await _service.GenerateOtpAsync(command, CancellationToken.None);
 
         // Assert
         Assert.Equal(6, otp.Length);

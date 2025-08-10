@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Application.Utilities;
@@ -16,10 +16,9 @@ public static class OtpHasher
     /// <returns>The hashed OTP as a hex string.</returns>
     public static string HashOtpWithSalt(string otp, string salt)
     {
-        using var sha = SHA256.Create();
-        var combined = $"{otp}{salt}";
-        var bytes = Encoding.UTF8.GetBytes(combined);
-        var hash = sha.ComputeHash(bytes);
+        string combined = $"{otp}{salt}";
+        byte[] bytes = Encoding.UTF8.GetBytes(combined);
+        byte[] hash = SHA256.HashData(bytes);
         return Convert.ToHexString(hash);
     }
 }

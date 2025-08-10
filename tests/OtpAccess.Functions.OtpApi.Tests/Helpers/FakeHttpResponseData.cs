@@ -1,4 +1,5 @@
-﻿using System.Net;
+using System.Net;
+
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace OtpAccess.Functions.OtpApi.Tests.Helpers;
@@ -10,14 +11,14 @@ namespace OtpAccess.Functions.OtpApi.Tests.Helpers;
 ///     Default values are provided for headers, status code, and cookies to simplify test setup.
 ///     Use <see cref="GetBodyAsString" /> to retrieve the written response body as a string for assertions in tests.
 /// </summary>
-public sealed class FakeHttpResponseData(HttpRequestData request) : HttpResponseData(request.FunctionContext)
+public sealed class FakeHttpResponseData(HttpRequestData request) : HttpResponseData(request.FunctionContext), IDisposable
 {
     private MemoryStream _bodyStream = new();
 
     public override Stream Body
     {
         get => _bodyStream;
-        set => _bodyStream = (MemoryStream) value;
+        set => _bodyStream = (MemoryStream)value;
     }
 
     public override HttpHeadersCollection Headers { get; set; } = [];
@@ -32,4 +33,6 @@ public sealed class FakeHttpResponseData(HttpRequestData request) : HttpResponse
         using var reader = new StreamReader(Body);
         return reader.ReadToEnd();
     }
+
+    public void Dispose() => throw new NotImplementedException();
 }
