@@ -1,0 +1,88 @@
+name: Auto Fix Style
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, develop]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: autofix-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      cs: ${{ steps.filter.outputs.cs }}
+      bicep: ${{ steps.filter.outputs.bicep }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            cs:
+              - '**/*.cs'
+            bicep:
+              - '**/*.bicep'
+            frontend:
+              - '**/*.js'
+              - '**/*.ts'
+              - '**/*.tsx'
+
+  autofix:
+    needs: detect-changes
+    if: |
+      needs.detect-changes.outputs.cs == 'true' ||
+      needs.detect-changes.outputs.bicep == 'true' ||
+      needs.detect-changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      # C# auto-format + analyzers
+      - if: needs.detect-changes.outputs.cs == 'true'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - if: needs.detect-changes.outputs.cs == 'true'
+        name: dotnet format
+        run: |
+          cd src/OTP
+          dotnet format OTP.sln --severity info
+          dotnet format analyzers --severity info
+
+      # Bicep auto-format
+      - if: needs.detect-changes.outputs.bicep == 'true'
+        name: Install Azure CLI + Bicep
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          az bicep install
+      - if: needs.detect-changes.outputs.bicep == 'true'
+        name: bicep format
+        run: |
+          shopt -s nullglob
+          for f in infrastructure/bicep/**/*.bicep infrastructure/bicep/*.bicep; do
+            bicep format "$f"
+          done
+          shopt -u nullglob
+
+      # JS/TS auto-fix
+      - if: needs.detect-changes.outputs.frontend == 'true'
+        name: ESLint --fix
+        run: |
+          npm ci || true
+          npx eslint . --ext .js,.ts,.tsx --fix || true
+
+      # Commit only if there are changes
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: apply auto-format [autofix]"
+          branch: ${{ github.head_ref }}

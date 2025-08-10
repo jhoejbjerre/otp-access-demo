@@ -1,9 +1,10 @@
 name: Automated Code Review
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main, develop]
+  workflow_run:
+    workflows: ["Auto Fix Style"] # navn på autofix workflow
+    types:
+      - completed
 
 permissions:
   contents: read
