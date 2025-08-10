@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   detect-changes:
+    if: ${{ github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
     outputs:
       cs: ${{ steps.filter.outputs.cs }}
@@ -37,10 +38,10 @@ jobs:
 
   autofix:
     needs: detect-changes
-    if: |
+    if: ${{ github.actor != 'github-actions[bot]' && (
       needs.detect-changes.outputs.cs == 'true' ||
       needs.detect-changes.outputs.bicep == 'true' ||
-      needs.detect-changes.outputs.frontend == 'true'
+      needs.detect-changes.outputs.frontend == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +52,7 @@ jobs:
       - if: needs.detect-changes.outputs.cs == 'true'
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
       - if: needs.detect-changes.outputs.cs == 'true'
         name: dotnet format
         run: |
@@ -81,8 +82,8 @@ jobs:
           npm ci || true
           npx eslint . --ext .js,.ts,.tsx --fix || true
 
-      # Commit only if there are changes
+      # Commit only if there are changes (and prevent re-trigger with [skip ci])
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore: apply auto-format [autofix]"
+          commit_message: "chore: apply auto-format [autofix] [skip ci]"
           branch: ${{ github.head_ref }}
