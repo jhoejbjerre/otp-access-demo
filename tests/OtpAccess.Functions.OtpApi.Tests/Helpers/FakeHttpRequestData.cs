@@ -14,7 +14,7 @@ namespace OtpAccess.Functions.OtpApi.Tests.Helpers;
 /// </summary>
 public sealed class FakeHttpRequestData(FunctionContext functionContext, string body) : HttpRequestData(functionContext)
 {
-    private readonly MemoryStream _bodyStream = new MemoryStream(Encoding.UTF8.GetBytes(body));
+    private readonly MemoryStream _bodyStream = new(Encoding.UTF8.GetBytes(body));
 
     public override Stream Body => _bodyStream;
 
