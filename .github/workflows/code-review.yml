@@ -49,7 +49,7 @@ jobs:
         with:
           script: |
             const prNum = Number('${{ steps.find.outputs.pr }}');
-            const { data: pr } = await github.pulls.get({
+            const { data: pr } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNum
@@ -65,13 +65,14 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               name: 'Automated Code Review',
-              head_sha: '${{ steps.getpr.outputs.sha }}',  // use PR head SHA
+              head_sha: '${{ steps.getpr.outputs.sha }}',
               status: 'in_progress',
               details_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });
             core.setOutput('check_id', String(res.data.id));
 
   detect-changes:
+    needs: init
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     outputs:
@@ -152,7 +153,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ needs.init.outputs.head_sha }}
-      # … your existing SonarQube steps, ensuring SUMMARY_MARKDOWN is set …
+      # … your existing SonarQube steps, ensure SUMMARY_MARKDOWN is set …
 
   finalize:
     needs: [init, detect-changes, lint-csharp, lint-bicep, lint-frontend, sonar-review]
@@ -198,7 +199,7 @@ jobs:
           script: |
             const owner = context.repo.owner;
             const repo  = context.repo.repo;
-            const head  = '${{ needs.init.outputs.head_sha }}';   // publish on PR head
+            const head  = '${{ needs.init.outputs.head_sha }}';
             const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
 
             async function stageCheck(name, result, summary) {
