@@ -22,29 +22,6 @@ Three workflows handle the full lifecycle:
 | `code-review.yml` | Runs language linters and SonarQube review **after** Auto Fix finished. Publishes per-stage PR checks. | `workflow_run` of **Auto Fix Style** (on `completed`) |
 | `deploy-otp.yml` | Deploys OTP infrastructure (dev/test/prod) with gated approvals. | `push` to `main` |
 
-```mermaid
-flowchart TD
-  %% Triggers
-  A[Pull Request
-  opened / synchronize / reopened] --> AF[Auto Fix Style workflow]
-
-  %% Auto Fix
-  subgraph G1["Auto Fix Style auto-fix.yml"]
-    direction LR
-    AF --> AF_detect[detect-changes
-    paths-filter]
-    AF_detect -->|C# changed| AF_cs[dotnet format OTP.sln
-    + analyzers]
-    AF_detect -->|Bicep changed| AF_bicep[bicep format
-    infrastructure/bicep/**]
-    AF_detect -->|JS/TS changed| AF_js[eslint --fix] 
-    AF_cs --> AF_commit[Auto-commit autofix + skip ci]
-    AF_bicep --> AF_commit
-    AF_detect -->|No relevant changes| AF_skip[Skip autofix]
-  end
-
----
-
 ## 1) Auto Fix Style (`auto-fix.yml`)
 
 **Purpose**
